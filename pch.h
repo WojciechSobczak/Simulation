@@ -68,8 +68,10 @@
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
 
+#include "Math.h"
 #include "Debug.h"
 #include "Object.h"
+#include "Cubic.h"
 #include "Simulation.h"
 #include "Window.h"
 

@@ -1,11 +1,6 @@
 #include "pch.h"
 #include "Simulation.h"
-
-#define xmvecfn(vec, n) vec.m128_f32[n]
-
-#define XMVECTOR_X(vec) xmvecfn(vec, 0)
-#define XMVECTOR_Y(vec) xmvecfn(vec, 1)
-#define XMVECTOR_Z(vec) xmvecfn(vec, 2)
+#define MOVE_MULTIPLYER 2.0f
 
 void Simulation::resetViewMatrix() {
 	using namespace DirectX;
@@ -22,8 +17,29 @@ void Simulation::resetViewMatrix() {
 	//XMVECTOR primalUp = DirectX::XMVector3TransformCoord(cameraUp, pitchMatrix);
 	//MAMY DZIA£AJ¥CE OBRACANIE, Teraz przesuniêcie
 
+	if (moveForward) {
+		XMVECTOR move = {0.0f, 0.0f, moveForward, 0.0f};
+		move = XMVector3TransformCoord(move, yawMatrix);
+		position += move * MOVE_MULTIPLYER;
+	} 
+
+	if (moveRight) {
+		XMVECTOR move = {moveRight, 0.0f, 0.0f, 0.0f};
+		move = XMVector3TransformCoord(move, yawMatrix);
+		position += move * MOVE_MULTIPLYER;
+	}
+
+	if (moveUp) {
+		XMVECTOR_Y(position) += moveUp;
+	}
 
 	rotatedLook += position;
-	Debug::printXMVECTOR(rotatedLook, "Look");
 	basicEffect->SetView(DirectX::XMMatrixLookAtLH(position, rotatedLook, cameraUp));
+#ifdef CAMERA_DEBUG
+	Debug::printXMVECTOR(rotatedLook, "Look");
+#endif // CAMERA_DEBUG
+
+	moveForward = 0;
+	moveRight = 0;
+	moveUp = 0;
 }

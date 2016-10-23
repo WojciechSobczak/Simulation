@@ -4,12 +4,6 @@
 
 class Object {
 public:
-	template<typename T>
-	Object(std::shared_ptr<DirectX::PrimitiveBatch<T>> batch);
-
-	std::vector<UINT> indicies;
-	std::vector<DirectX::SimpleMath::Vector3> verticies;
-
-	virtual void render();
-	virtual void printToOutput();
+	virtual void render() = 0;
+	virtual void printToOutput() = 0;
 };

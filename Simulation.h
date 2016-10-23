@@ -66,7 +66,7 @@ private:
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	);
-	DirectX::XMVECTOR position = {0.0f, 250.0f, -250.0f};
+	DirectX::XMVECTOR position = {-29.853180, 272.589142, -440.206512};
 	const DirectX::XMVECTOR cameraPosition = {0.0f, 0.0f, 0.0f};
 	const DirectX::XMVECTOR cameraUp = {0.0f, 1.0f, 0.0f};
 	const DirectX::XMVECTOR cameraLook = {0.0f, 0.0f, -1.0f};
@@ -96,7 +96,7 @@ private:
 
 	std::unique_ptr<DirectX::CommonStates> states;
 	std::unique_ptr<DirectX::BasicEffect> basicEffect;
-	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> coloredBatch;
-	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>> texturedTriangleBatch;
+	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> coloredBatch;
+	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>> texturedTriangleBatch;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 };

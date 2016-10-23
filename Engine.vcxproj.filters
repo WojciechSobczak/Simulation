@@ -27,9 +27,6 @@
     <ClInclude Include="Window.h">
       <Filter>Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Simulation</Filter>
-    </ClInclude>
     <ClInclude Include="RenderTables.h">
       <Filter>Simulation</Filter>
     </ClInclude>
@@ -44,6 +41,9 @@
     </ClInclude>
     <ClInclude Include="Math.h">
       <Filter>Simulation\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Simulation\BasicShapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +66,9 @@
     </ClCompile>
     <ClCompile Include="resetViewMatrix.cpp">
       <Filter>Simulation\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Cubic.cpp">
+      <Filter>Simulation\BasicShapes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

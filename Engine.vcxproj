@@ -161,6 +161,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cubic.cpp" />
     <ClCompile Include="onKeyboardKeyPress.cpp" />
     <ClCompile Include="onMouseMove.cpp" />
     <ClCompile Include="RenderTables.cpp" />

@@ -54,6 +54,26 @@ void Simulation::renderScene() {
 	basicEffect->Apply(deviceContext.Get());
 	deviceContext->IASetInputLayout(m_inputLayout.Get());
 
+
+
+
+	VertexPositionColor v0(Vector3(-100, 0, 0), DirectX::Colors::Green);
+	VertexPositionColor v1(Vector3(0, 173.2f, 0), DirectX::Colors::Black);
+	VertexPositionColor v2(Vector3(100, 0, 0), DirectX::Colors::Blue);
+	VertexPositionColor v3(Vector3(0, 0, -100), DirectX::Colors::Red);
+	VertexPositionColor v4(Vector3(0, 0, 100), DirectX::Colors::Yellow);
+	VertexPositionColor verticies[] = {v0, v1, v2, v3, v4};
+	//Not optimal, just for tests
+	const uint16_t indicies[] = {
+		0, 1, 3,
+		3, 1, 2,
+		2, 1, 4,
+		4, 1, 0,
+		0, 3, 2,
+		2, 4, 0
+	};
+
+
 	coloredBatch->Begin();
 	size_t divisions = 20;
 	Vector3 origin = Vector3::Zero;
@@ -81,29 +101,15 @@ void Simulation::renderScene() {
 		coloredBatch->DrawLine(v1, v2);
 	}
 
-	VertexPositionColor v0(Vector3(-100, 0, 0), DirectX::Colors::Green);
-	VertexPositionColor v1(Vector3(0, 173.2f, 0), DirectX::Colors::Black);
-	VertexPositionColor v2(Vector3(100, 0, 0), DirectX::Colors::Blue);
-	VertexPositionColor v3(Vector3(0, 0, -100), DirectX::Colors::Red);
-	VertexPositionColor v4(Vector3(0, 0, 100), DirectX::Colors::Yellow);
-	VertexPositionColor verticies[] = {v0, v1, v2, v3, v4};
-	//Not optimal, just for tests
-	const uint16_t indicies[] = {
-		0, 1, 3,
-		3, 1, 2,
-		2, 1, 4,
-		4, 1, 0,
-		0, 3, 2,
-		2, 4, 0
-	};
 	coloredBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
 							  indicies,
 							  _countof(indicies),
 							  verticies,
 							  _countof(verticies)
 	);
-
-
+	DirectX::XMVECTOR start = {200.0f, 200.0f, 200.0f, 0.0f};
+	Cubic cubic = Cubic(coloredBatch, start, 200);
+	cubic.render();
 	coloredBatch->End();
 	
 
@@ -199,7 +205,7 @@ void Simulation::createDevice() {
 
 	DX::ThrowIfFailed(hr);
 
-#ifndef _DEBUG
+#ifdef _DEBUG
 	ComPtr<ID3D11Debug> d3dDebug;
 	if (SUCCEEDED(device.As(&d3dDebug))) {
 		ComPtr<ID3D11InfoQueue> d3dInfoQueue;
