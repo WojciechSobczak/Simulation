@@ -151,6 +151,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Cubic.h" />
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="Math.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="RenderTables.h" />
     <ClInclude Include="Simulation.h" />
@@ -159,8 +161,10 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="onKeyboardKeyPress.cpp" />
     <ClCompile Include="onMouseMove.cpp" />
     <ClCompile Include="RenderTables.cpp" />
+    <ClCompile Include="resetViewMatrix.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">

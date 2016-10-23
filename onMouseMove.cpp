@@ -1,39 +1,38 @@
 #include "pch.h"
-#define MOUSE_MOVE_DEBUG
+#define mouse_step 0.01f;
+#define control_angle(x) if (x > 2*M_PI) {x = 0;} else if (x < 0) {x = 2*M_PI;}
+#define pitch_control_angle(x) if (x > M_PI_2) {x = M_PI_2 - 0.01f;} else if (x < -M_PI_2) {x = -M_PI_2 + 0.01f;}
 
-void Simulation::onMouseMove(int x, int y) {
-	if (!leftMouseButtonDown || x > windowWidth || y > windowHeight) {
+void Simulation::onMouseOver(int x, int y) {
+	if (x > windowWidth || y > windowHeight) {
 		return;
 	}
 
-	if (y > prevMousey) {
-		phi += 0.03f;
-	} else {
-		phi -= 0.03f;
+	if (float(y) > float(windowHeight) * 0.8f) {
+		pitch += mouse_step;
+	} else if (float(y) < float(windowHeight) * 0.2f) {
+		pitch -= mouse_step;
 	}
 
-	if (x > prevMousex) {
-		theta += 0.03f;
-	} else {
-		theta -= 0.03f;
+	if ((float(x) > float(windowWidth) * 0.8f)) {
+		yaw -= mouse_step;
+	} else if ((float(x) < float(windowWidth) * 0.2f)) {
+		yaw += mouse_step;
 	}
+
+	control_angle(yaw);
+	pitch_control_angle(pitch);
 
 	prevMousex = x;
 	prevMousey = y;
-
-	float tx = r * cos(phi) * cos(theta);
-	float tz = r * cos(phi) * sin(theta);
-	float ty = r * sin(phi);
-
+#define MOUSE_MOVE_DEBUG
 #ifdef MOUSE_MOVE_DEBUG
 	std::string s;
-	s += "x = " + std::to_string(tx) + " ";
-	s += "y = " + std::to_string(ty) + " ";
-	s += "z = " + std::to_string(tz) + " ";
-	s += "r = " + std::to_string(r) + " ";
-	s += "phi = " + std::to_string(phi) + " ";
-	s += "theta = " + std::to_string(theta) + "\n";
+	s += "pitch = " + std::to_string(pitch) + " ";
+	s += "yaw = " + std::to_string(yaw) + "\n";
 	OutputDebugStringA(s.c_str());
 #endif
-	basicEffect->SetView(Matrix::CreateLookAt(Vector3(tx, ty, tz), Vector3::Zero, Vector3(Vector3::UnitY.x, cos(phi), Vector3::UnitY.z)));
+
+	resetViewMatrix();
 }
+

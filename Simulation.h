@@ -22,8 +22,6 @@ public:
 	const int defaultHeight = 720;
 	const float aspectRatio = float(defaultWidth) / float(defaultHeight);
 
-	Vector3 look = Vector3::UnitZ;
-
     // Initialization and management
     void initialize(HWND window, int width, int height);
 
@@ -32,15 +30,17 @@ public:
 
     // Messages
     void onWindowSizeChanged(int width, int height);
-	void onMouseMove(int x, int y);
+	void onMouseOver(int x, int y);
 	void onLeftMouseButtonDown(int x, int y);
 	void onLeftMouseButtonUp(int x, int y);
+	void onKeyboardKeyPress();
 
 	bool leftMouseButtonDown = false;
 	bool rightMouseButtonUp = false;
 private:
 
     void update(DX::StepTimer const& timer);
+	void resetViewMatrix();
     void renderScene();
     void clearBuffers();
     void presentBackBuffer();
@@ -49,11 +49,28 @@ private:
     void onDeviceLost();
 	int prevMousex = 0;
 	int prevMousey = 0;
-	float phi = 0;
-	float theta = 0;
-	float r = 1;
 
-	const Matrix worldProjection = Matrix::CreateOrthographicOffCenter(-500, 500, -500, 500, -500, 500);
+	float moveForward = 0;
+	float moveRight = 0;
+	float moveUp = 250;
+
+	float yaw = 0;
+	float roll = 0;
+	float pitch = 1;
+
+	const Matrix worldProjection = Matrix::CreatePerspectiveFieldOfView(M_PI_2, aspectRatio, 1, 2000);
+	//const Matrix worldProjection = Matrix::CreateOrthographicOffCenter(-500, 500, -500, 500, -500, 500);
+	DirectX::XMMATRIX cameraProjection = DirectX::XMMatrixSet(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	);
+	DirectX::XMVECTOR position = {0.0f, 250.0f, -250.0f};
+	const DirectX::XMVECTOR cameraPosition = {0.0f, 0.0f, 0.0f};
+	const DirectX::XMVECTOR cameraUp = {0.0f, 1.0f, 0.0f};
+	const DirectX::XMVECTOR cameraLook = {0.0f, 0.0f, -1.0f};
+	const DirectX::XMVECTOR cameraRight = {1.0f, 0.0f, 0.0f};
 
 	const std::vector<std::vector<Object>> objects = std::vector<std::vector<Object>>();
 

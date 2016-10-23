@@ -40,6 +40,7 @@
 #include <wrl/client.h>
 
 #include <d3d11_1.h>
+//#include <d3dtypes.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 
@@ -67,6 +68,7 @@
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
 
+#include "Debug.h"
 #include "Object.h"
 #include "Simulation.h"
 #include "Window.h"

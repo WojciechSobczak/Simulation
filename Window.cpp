@@ -10,6 +10,7 @@ LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, L
 	static bool s_in_suspend = false;
 	static bool s_minimized = false;
 	static bool s_fullscreen = false;
+	static bool isMouseTracked = false;
 
 	Simulation* simulation = reinterpret_cast<Simulation*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
@@ -18,7 +19,6 @@ LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, L
 			hdc = BeginPaint(hWnd, &ps);
 			EndPaint(hWnd, &ps);
 			break;
-
 		case WM_SIZE:
 			if (!s_in_sizemove && simulation) {
 				simulation->onWindowSizeChanged(LOWORD(lParam), HIWORD(lParam));
@@ -72,10 +72,19 @@ LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, L
 				s_fullscreen = !s_fullscreen;
 			}
 			break;
-
-		case WM_MOUSEMOVE:
-			simulation->onMouseMove(LOWORD(lParam), HIWORD(lParam));
+		case WM_MOUSEMOVE: {
+			if (!isMouseTracked) {
+				captureMouse(hWnd);
+				isMouseTracked = true;
+			}
 			break;
+		}
+		case WM_MOUSEHOVER: {
+			captureMouse(hWnd);
+			OutputDebugStringA("Hover\n");
+			simulation->onMouseOver(LOWORD(lParam), HIWORD(lParam));
+			break;
+		}
 		case WM_LBUTTONDOWN:
 			SetCapture(hWnd);
 			simulation->onLeftMouseButtonDown(LOWORD(lParam), HIWORD(lParam));
@@ -84,9 +93,36 @@ LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, L
 			ReleaseCapture();
 			simulation->onLeftMouseButtonUp(LOWORD(lParam), HIWORD(lParam));
 			break;
+		case WM_CHAR: //WSAD
+			simulation->onKeyboardKeyPress();
+			break;
+		case WM_KEYDOWN: //Arrows
+			simulation->onKeyboardKeyPress();
+			break;
+		case WM_MOUSELEAVE:
+			OutputDebugStringA("LEAVE\n");
+			isMouseTracked = false;
+			break;
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+bool captureMouse(HWND hWnd) {
+	tagTRACKMOUSEEVENT  trackMouse = {};
+	ZeroMemory(&trackMouse, sizeof(tagTRACKMOUSEEVENT));
+	trackMouse.dwFlags = TME_HOVER | TME_LEAVE;
+	trackMouse.hwndTrack = hWnd;
+	trackMouse.dwHoverTime = 10;
+	trackMouse.cbSize = sizeof(tagTRACKMOUSEEVENT);
+#ifdef DEBUG
+	if (successTracking) {
+		OutputDebugStringA("Tracking success!\n");
+	} else {
+		OutputDebugStringA("Tracking failure!\n");
+	}
+#endif // DEBUG
+	return TrackMouseEvent(&trackMouse);
 }
 
 HWND createWindow(HINSTANCE hInstance, std::shared_ptr<Simulation> simulation, int nCmdShow) {
@@ -137,6 +173,7 @@ HWND createWindow(HINSTANCE hInstance, std::shared_ptr<Simulation> simulation, i
 	ShowWindow(windowHandler, nCmdShow);
 	SetWindowLongPtr(windowHandler, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(simulation.get()));
 	GetClientRect(windowHandler, &rect);
+
 	simulation->initialize(windowHandler, rect.right - rect.left, rect.bottom - rect.top);
 	return windowHandler;
 }

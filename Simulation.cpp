@@ -22,7 +22,6 @@ void Simulation::initialize(HWND window, int width, int height) {
 	windowHeight = std::max(height, 1);
 	createDevice();
 	createResources();
-
 	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
 	// e.g. for 60 FPS fixed timestep update logic, call:
 	/*
@@ -56,6 +55,32 @@ void Simulation::renderScene() {
 	deviceContext->IASetInputLayout(m_inputLayout.Get());
 
 	coloredBatch->Begin();
+	size_t divisions = 20;
+	Vector3 origin = Vector3::Zero;
+	Vector3 xaxis(500.f, 0.f, 0.f);
+	Vector3 yaxis(0.f, 0.f, 500.f);
+	for (size_t i = 0; i <= divisions; ++i) {
+		float fPercent = float(i) / float(divisions);
+		fPercent = (fPercent * 2.0f) - 1.0f;
+
+		Vector3 scale = xaxis * fPercent + origin;
+
+		VertexPositionColor v1(scale - yaxis, DirectX::Colors::White);
+		VertexPositionColor v2(scale + yaxis, DirectX::Colors::White);
+		coloredBatch->DrawLine(v1, v2);
+	}
+
+	for (size_t i = 0; i <= divisions; i++) {
+		float fPercent = float(i) / float(divisions);
+		fPercent = (fPercent * 2.0f) - 1.0f;
+
+		Vector3 scale = yaxis * fPercent + origin;
+
+		VertexPositionColor v1(scale - xaxis, DirectX::Colors::White);
+		VertexPositionColor v2(scale + xaxis, DirectX::Colors::White);
+		coloredBatch->DrawLine(v1, v2);
+	}
+
 	VertexPositionColor v0(Vector3(-100, 0, 0), DirectX::Colors::Green);
 	VertexPositionColor v1(Vector3(0, 173.2f, 0), DirectX::Colors::Black);
 	VertexPositionColor v2(Vector3(100, 0, 0), DirectX::Colors::Blue);
@@ -64,28 +89,23 @@ void Simulation::renderScene() {
 	VertexPositionColor verticies[] = {v0, v1, v2, v3, v4};
 	//Not optimal, just for tests
 	const uint16_t indicies[] = {
-		0, 1, 3, 
-		3, 1, 2, 
-		2, 1, 4, 
-		4, 1, 0, 
-		0, 3, 2, 
+		0, 1, 3,
+		3, 1, 2,
+		2, 1, 4,
+		4, 1, 0,
+		0, 3, 2,
 		2, 4, 0
-};
+	};
 	coloredBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-									  indicies,
-									  _countof(indicies),
-									  verticies,
-									  _countof(verticies)
+							  indicies,
+							  _countof(indicies),
+							  verticies,
+							  _countof(verticies)
 	);
-	//Lines
-	VertexPositionColor lv1(Vector3(-100, 0, 0), DirectX::Colors::Green);
-	VertexPositionColor lv2(Vector3(0, 173.2f, 0), DirectX::Colors::Green);
-	VertexPositionColor lv3(Vector3(100, 0, 0), DirectX::Colors::Green);
-	VertexPositionColor lv4(Vector3(0, 173.2f, -100), DirectX::Colors::Red);
-	VertexPositionColor lv5(Vector3(0, 0, 100), DirectX::Colors::Red);
-	VertexPositionColor lv6(Vector3(0, 0, 100), DirectX::Colors::Red);
+
 
 	coloredBatch->End();
+	
 
 	//Zwalnianie bufora do renderowania
 	presentBackBuffer();
@@ -214,9 +234,7 @@ void Simulation::createDevice() {
 	basicEffect = std::make_unique<DirectX::BasicEffect>(device.Get());
 	basicEffect->SetVertexColorEnabled(true);
 	basicEffect->SetProjection(worldProjection);
-
-	Matrix lookAt = Matrix::CreateLookAt(Vector3::UnitZ, Vector3::Zero, Vector3::UnitY);
-	basicEffect->SetView(lookAt);
+	basicEffect->SetView(cameraProjection);
 
 	void const* shaderByteCode;
 	size_t byteCodeLength;
@@ -373,4 +391,5 @@ void Simulation::onLeftMouseButtonDown(int x, int y) {
 void Simulation::onLeftMouseButtonUp(int x, int y) {
 	leftMouseButtonDown = false;
 }
+
 

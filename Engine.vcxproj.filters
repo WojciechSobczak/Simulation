@@ -17,6 +17,9 @@
     <Filter Include="Simulation\Simulation">
       <UniqueIdentifier>{51129268-5092-4f53-b1f1-31355f68f029}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Simulation\Utils">
+      <UniqueIdentifier>{0fcfbc08-1a3a-4e6c-84f9-d66ed4620940}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -27,14 +30,20 @@
     <ClInclude Include="Object.h">
       <Filter>Simulation</Filter>
     </ClInclude>
-    <ClInclude Include="Simulation.h">
-      <Filter>Simulation</Filter>
-    </ClInclude>
     <ClInclude Include="RenderTables.h">
       <Filter>Simulation</Filter>
     </ClInclude>
     <ClInclude Include="Cubic.h">
       <Filter>Simulation\BasicShapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulation.h">
+      <Filter>Simulation\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Simulation\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>Simulation\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -43,13 +52,19 @@
     <ClCompile Include="Window.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
-    <ClCompile Include="Simulation.cpp">
-      <Filter>Simulation</Filter>
-    </ClCompile>
     <ClCompile Include="RenderTables.cpp">
       <Filter>Simulation</Filter>
     </ClCompile>
     <ClCompile Include="onMouseMove.cpp">
+      <Filter>Simulation\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="onKeyboardKeyPress.cpp">
+      <Filter>Simulation\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulation.cpp">
+      <Filter>Simulation\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="resetViewMatrix.cpp">
       <Filter>Simulation\Simulation</Filter>
     </ClCompile>
   </ItemGroup>
