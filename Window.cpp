@@ -81,7 +81,6 @@ LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, L
 		}
 		case WM_MOUSEHOVER: {
 			captureMouse(hWnd);
-			OutputDebugStringA("Hover\n");
 			simulation->onMouseOver(LOWORD(lParam), HIWORD(lParam));
 			break;
 		}
@@ -100,7 +99,6 @@ LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, L
 			simulation->onKeyboardKeyPress();
 			break;
 		case WM_MOUSELEAVE:
-			OutputDebugStringA("LEAVE\n");
 			isMouseTracked = false;
 			break;
 	}

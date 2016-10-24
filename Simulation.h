@@ -18,6 +18,7 @@ public:
     Simulation();
 	~Simulation();
 
+	const float tickTime = float(1) / float(60);
 	const int defaultWidth = 1280;
 	const int defaultHeight = 720;
 	const float aspectRatio = float(defaultWidth) / float(defaultHeight);
@@ -37,7 +38,11 @@ public:
 
 	bool leftMouseButtonDown = false;
 	bool rightMouseButtonUp = false;
+
 private:
+
+	std::vector<std::shared_ptr<Object<DirectX::VertexPositionColor>>> coloredShapes;
+
 
     void update(DX::StepTimer const& timer);
 	void resetViewMatrix();
@@ -72,9 +77,6 @@ private:
 	const DirectX::XMVECTOR cameraLook = {0.0f, 0.0f, -1.0f};
 	const DirectX::XMVECTOR cameraRight = {1.0f, 0.0f, 0.0f};
 
-	const std::vector<std::vector<Object>> objects = std::vector<std::vector<Object>>();
-
-
     // Device resources.
     HWND                                            windowHandler;
     int                                             windowWidth = defaultWidth;
@@ -91,12 +93,25 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  renderTargetView;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  depthStencilView;
 
-    // Rendering loop timer.
-    DX::StepTimer                                   timer;
+	//Stages
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState>	rasterizerStage;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStage;
 
-	std::unique_ptr<DirectX::CommonStates> states;
-	std::unique_ptr<DirectX::BasicEffect> basicEffect;
-	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> coloredBatch;
-	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>> texturedTriangleBatch;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+    // Rendering loop timer.
+    DX::StepTimer timer;
+
+	std::unique_ptr<DirectX::CommonStates>										states;
+	std::unique_ptr<DirectX::BasicEffect>										basicEffect;
+	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>		coloredBatch;
+	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>>	texturedTriangleBatch;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout>									inputLayout;
+
+
+	btDiscreteDynamicsWorld*								bulletWorld;
+	btDefaultCollisionConfiguration*						physicsCollisionConfig;
+	btCollisionDispatcher*									physicsCollisionDispatcher;
+	btBroadphaseInterface*									physicsBroadphase;
+	btSequentialImpulseConstraintSolver*					physicsSolver;
+	btDiscreteDynamicsWorld*								physicsWorld;
+	btAlignedObjectArray<btCollisionShape*>					physicsShapes;
 };

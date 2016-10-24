@@ -40,7 +40,6 @@
 #include <wrl/client.h>
 
 #include <d3d11_1.h>
-//#include <d3dtypes.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 
@@ -48,7 +47,7 @@
 #include <exception>
 #include <memory>
 #include <stdexcept>
-
+#include <time.h>
 
 #include "CommonStates.h"
 #include "DDSTextureLoader.h"
@@ -68,10 +67,14 @@
 #include "VertexTypes.h"
 #include "WICTextureLoader.h"
 
+#include <btBulletDynamicsCommon.h>
+
 #include "Math.h"
 #include "Debug.h"
 #include "Object.h"
-#include "Cubic.h"
+#include "Cube.h"
+#include "Floor.h"
+#include "Pyramid.h"
 #include "Simulation.h"
 #include "Window.h"
 

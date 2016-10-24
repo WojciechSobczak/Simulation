@@ -30,9 +30,6 @@
     <ClInclude Include="RenderTables.h">
       <Filter>Simulation</Filter>
     </ClInclude>
-    <ClInclude Include="Cubic.h">
-      <Filter>Simulation\BasicShapes</Filter>
-    </ClInclude>
     <ClInclude Include="Simulation.h">
       <Filter>Simulation\Simulation</Filter>
     </ClInclude>
@@ -43,6 +40,15 @@
       <Filter>Simulation\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
+      <Filter>Simulation\BasicShapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Simulation\BasicShapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Pyramid.h">
+      <Filter>Simulation\BasicShapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Floor.h">
       <Filter>Simulation\BasicShapes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -67,7 +73,16 @@
     <ClCompile Include="resetViewMatrix.cpp">
       <Filter>Simulation\Simulation</Filter>
     </ClCompile>
-    <ClCompile Include="Cubic.cpp">
+    <ClCompile Include="renderScene.cpp">
+      <Filter>Simulation\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Simulation\BasicShapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Pyramid.cpp">
+      <Filter>Simulation\BasicShapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Floor.cpp">
       <Filter>Simulation\BasicShapes</Filter>
     </ClCompile>
   </ItemGroup>

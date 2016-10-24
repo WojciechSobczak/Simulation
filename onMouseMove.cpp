@@ -25,7 +25,6 @@ void Simulation::onMouseOver(int x, int y) {
 
 	prevMousex = x;
 	prevMousey = y;
-#define MOUSE_MOVE_DEBUG
 #ifdef MOUSE_MOVE_DEBUG
 	std::string s;
 	s += "pitch = " + std::to_string(pitch) + " ";

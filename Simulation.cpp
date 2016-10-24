@@ -22,12 +22,34 @@ void Simulation::initialize(HWND window, int width, int height) {
 	windowHeight = std::max(height, 1);
 	createDevice();
 	createResources();
-	// TODO: Change the timer settings if you want something other than the default variable timestep mode.
-	// e.g. for 60 FPS fixed timestep update logic, call:
-	/*
-	m_timer.SetFixedTimeStep(true);
-	m_timer.SetTargetElapsedSeconds(1.0 / 60);
-	*/
+
+
+	physicsBroadphase = new btDbvtBroadphase();
+	physicsCollisionConfig = new btDefaultCollisionConfiguration();
+	physicsCollisionDispatcher = new btCollisionDispatcher(physicsCollisionConfig);
+	physicsSolver = new btSequentialImpulseConstraintSolver();
+	bulletWorld = new btDiscreteDynamicsWorld(
+		physicsCollisionDispatcher,
+		physicsBroadphase,
+		physicsSolver,
+		physicsCollisionConfig
+	);
+	bulletWorld->setGravity(btVector3(0, -9.8, 0));
+	timer.SetFixedTimeStep(true);
+	timer.SetTargetElapsedSeconds(tickTime);
+
+	DirectX::XMVECTOR start = {200.0f, 200.0f, 200.0f, 0.0f};
+	std::shared_ptr<Cube> cube = std::make_shared<Cube>(coloredBatch, start, 200);
+	start = {0.0f, 0.0f, 0.0f, 0.0f};
+	std::shared_ptr<Pyramid> pyramid = std::make_shared<Pyramid>(coloredBatch, start, 200);
+	std::shared_ptr<Floor> floor = std::make_shared<Floor>(coloredBatch, 500);
+	cube->registerCollisionObject(bulletWorld);
+
+	coloredShapes.push_back(floor);
+	coloredShapes.push_back(cube);
+	coloredShapes.push_back(pyramid);
+
+
 }
 
 // Executes the basic game loop.
@@ -35,6 +57,7 @@ void Simulation::tick() {
 	timer.Tick([&]() {
 		update(timer);
 	});
+	bulletWorld->stepSimulation(tickTime);
 	renderScene();
 }
 
@@ -43,78 +66,6 @@ void Simulation::update(DX::StepTimer const& timer) {
 	float elapsedTime = float(timer.GetElapsedSeconds());
 	// TODO: Add your game logic here.
 	elapsedTime;
-}
-
-void Simulation::renderScene() {
-	//Przed renderowaniem nastêpuje czyszczenie buforów
-	clearBuffers();
-	deviceContext->OMSetBlendState(states->Opaque(), nullptr, 0xFFFFFFFF);
-	deviceContext->OMSetDepthStencilState(states->DepthNone(), 0);
-	deviceContext->RSSetState(states->CullCounterClockwise());
-	basicEffect->Apply(deviceContext.Get());
-	deviceContext->IASetInputLayout(m_inputLayout.Get());
-
-
-
-
-	VertexPositionColor v0(Vector3(-100, 0, 0), DirectX::Colors::Green);
-	VertexPositionColor v1(Vector3(0, 173.2f, 0), DirectX::Colors::Black);
-	VertexPositionColor v2(Vector3(100, 0, 0), DirectX::Colors::Blue);
-	VertexPositionColor v3(Vector3(0, 0, -100), DirectX::Colors::Red);
-	VertexPositionColor v4(Vector3(0, 0, 100), DirectX::Colors::Yellow);
-	VertexPositionColor verticies[] = {v0, v1, v2, v3, v4};
-	//Not optimal, just for tests
-	const uint16_t indicies[] = {
-		0, 1, 3,
-		3, 1, 2,
-		2, 1, 4,
-		4, 1, 0,
-		0, 3, 2,
-		2, 4, 0
-	};
-
-
-	coloredBatch->Begin();
-	size_t divisions = 20;
-	Vector3 origin = Vector3::Zero;
-	Vector3 xaxis(500.f, 0.f, 0.f);
-	Vector3 yaxis(0.f, 0.f, 500.f);
-	for (size_t i = 0; i <= divisions; ++i) {
-		float fPercent = float(i) / float(divisions);
-		fPercent = (fPercent * 2.0f) - 1.0f;
-
-		Vector3 scale = xaxis * fPercent + origin;
-
-		VertexPositionColor v1(scale - yaxis, DirectX::Colors::White);
-		VertexPositionColor v2(scale + yaxis, DirectX::Colors::White);
-		coloredBatch->DrawLine(v1, v2);
-	}
-
-	for (size_t i = 0; i <= divisions; i++) {
-		float fPercent = float(i) / float(divisions);
-		fPercent = (fPercent * 2.0f) - 1.0f;
-
-		Vector3 scale = yaxis * fPercent + origin;
-
-		VertexPositionColor v1(scale - xaxis, DirectX::Colors::White);
-		VertexPositionColor v2(scale + xaxis, DirectX::Colors::White);
-		coloredBatch->DrawLine(v1, v2);
-	}
-
-	coloredBatch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-							  indicies,
-							  _countof(indicies),
-							  verticies,
-							  _countof(verticies)
-	);
-	DirectX::XMVECTOR start = {200.0f, 200.0f, 200.0f, 0.0f};
-	Cubic cubic = Cubic(coloredBatch, start, 200);
-	cubic.render();
-	coloredBatch->End();
-	
-
-	//Zwalnianie bufora do renderowania
-	presentBackBuffer();
 }
 
 void Simulation::clearBuffers() {
@@ -252,7 +203,7 @@ void Simulation::createDevice() {
 			VertexPositionColor::InputElements,
 			VertexPositionColor::InputElementCount,
 			shaderByteCode, byteCodeLength,
-			m_inputLayout.ReleaseAndGetAddressOf()
+			inputLayout.ReleaseAndGetAddressOf()
 		)
 	);
 	coloredBatch = std::make_unique<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>(deviceContext.Get());
@@ -365,6 +316,43 @@ void Simulation::createResources() {
 	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
 	DX::ThrowIfFailed(device->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, depthStencilView.ReleaseAndGetAddressOf()));
 
+	CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, 
+									D3D11_CULL_BACK, 
+									FALSE,
+									D3D11_DEFAULT_DEPTH_BIAS, 
+									D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
+									D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, 
+									TRUE, 
+									FALSE, 
+									FALSE, 
+									TRUE);
+	DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, rasterizerStage.ReleaseAndGetAddressOf()));
+
+	D3D11_DEPTH_STENCIL_DESC dsDesc;
+	// Depth test parameters
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	// Stencil test parameters
+	dsDesc.StencilEnable = true;
+	dsDesc.StencilReadMask = 0xFF;
+	dsDesc.StencilWriteMask = 0xFF;
+
+	// Stencil operations if pixel is front-facing
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Stencil operations if pixel is back-facing
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	device->CreateDepthStencilState(&dsDesc, depthStencilStage.GetAddressOf());
+
 	// TODO: Initialize windows-size dependent objects here.
 }
 
@@ -383,7 +371,8 @@ void Simulation::onDeviceLost() {
 	states.reset();
 	basicEffect.reset();
 	coloredBatch.reset();
-	m_inputLayout.Reset();
+	inputLayout.Reset();
+	rasterizerStage.Reset();
 
 	createDevice();
 
