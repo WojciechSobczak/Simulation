@@ -20,6 +20,18 @@
     <Filter Include="Simulation\Utils">
       <UniqueIdentifier>{0fcfbc08-1a3a-4e6c-84f9-d66ed4620940}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Simulation\BasicShapes\Cube">
+      <UniqueIdentifier>{1b41aa36-28f5-44eb-931f-529e2f29e429}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Simulation\BasicShapes\Pyramid">
+      <UniqueIdentifier>{3e4146fa-2f6b-4aa0-9dd0-4b7b0ff7c516}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Simulation\BasicShapes\Floor">
+      <UniqueIdentifier>{3e71b778-415a-49ea-95cc-6131fb480efd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Simulation\BasicShapes\Sphere">
+      <UniqueIdentifier>{aca27762-9785-46af-8396-58d8c9fdddf1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -42,14 +54,20 @@
     <ClInclude Include="Object.h">
       <Filter>Simulation\BasicShapes</Filter>
     </ClInclude>
+    <ClInclude Include="DXDebugDraw.h">
+      <Filter>Simulation\Simulation</Filter>
+    </ClInclude>
     <ClInclude Include="Cube.h">
-      <Filter>Simulation\BasicShapes</Filter>
+      <Filter>Simulation\BasicShapes\Cube</Filter>
     </ClInclude>
     <ClInclude Include="Pyramid.h">
-      <Filter>Simulation\BasicShapes</Filter>
+      <Filter>Simulation\BasicShapes\Pyramid</Filter>
     </ClInclude>
     <ClInclude Include="Floor.h">
-      <Filter>Simulation\BasicShapes</Filter>
+      <Filter>Simulation\BasicShapes\Floor</Filter>
+    </ClInclude>
+    <ClInclude Include="Sphere.h">
+      <Filter>Simulation\BasicShapes\Sphere</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -76,14 +94,20 @@
     <ClCompile Include="renderScene.cpp">
       <Filter>Simulation\Simulation</Filter>
     </ClCompile>
-    <ClCompile Include="Cube.cpp">
+    <ClCompile Include="Object.cpp">
       <Filter>Simulation\BasicShapes</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube.cpp">
+      <Filter>Simulation\BasicShapes\Cube</Filter>
     </ClCompile>
     <ClCompile Include="Pyramid.cpp">
-      <Filter>Simulation\BasicShapes</Filter>
+      <Filter>Simulation\BasicShapes\Pyramid</Filter>
     </ClCompile>
     <ClCompile Include="Floor.cpp">
-      <Filter>Simulation\BasicShapes</Filter>
+      <Filter>Simulation\BasicShapes\Floor</Filter>
+    </ClCompile>
+    <ClCompile Include="Sphere.cpp">
+      <Filter>Simulation\BasicShapes\Sphere</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

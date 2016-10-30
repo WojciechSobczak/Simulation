@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Simulation.h"
-
+#define KEYBOARD_DEBUG
 void Simulation::onKeyboardKeyPress() {
 	Vector3 buf = Vector3::Zero;
 	if ((1 << 16) & GetAsyncKeyState('W')) {
@@ -37,6 +37,14 @@ void Simulation::onKeyboardKeyPress() {
 		OutputDebugStringA("E pressed\n");
 	#endif // KEYBOARD_DEBUG
 	} 
+
+	static int zpressed = 0;
+	if (0x8000 & GetKeyState('Z') && zpressed++ % 2) {
+		physicsEnabled = !physicsEnabled;
+	#ifdef KEYBOARD_DEBUG
+		OutputDebugStringA("Z pressed\n");
+	#endif // KEYBOARD_DEBUG
+	}
 
 	resetViewMatrix();
 }

@@ -1,7 +1,24 @@
 #include "pch.h"
 #include "Simulation.h"
 #include <time.h>
-#define TIME_EFF_TEST
+#undef TIME_EFF_TEST
+using namespace DirectX;
+void renderAxes(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> batch) {
+	batch->DrawLine(
+		VertexPositionColor({-500, 0, 0, 0}, Colors::Green),
+		VertexPositionColor({500, 0, 0, 0}, Colors::Green)
+	);
+	batch->DrawLine(
+		VertexPositionColor({0, -500, 0, 0}, Colors::Red),
+		VertexPositionColor({0, 500, 0, 0}, Colors::Red)
+	);
+	batch->DrawLine(
+		VertexPositionColor({0, 0, -500, 0}, Colors::Blue),
+		VertexPositionColor({0, 0, 500, 0}, Colors::Blue)
+	);
+}
+
+
 void Simulation::renderScene() {
 	//Przed renderowaniem nastêpuje czyszczenie buforów
 #ifdef TIME_EFF_TEST
@@ -17,11 +34,12 @@ void Simulation::renderScene() {
 	deviceContext->IASetInputLayout(inputLayout.Get());
 
 	
-	using namespace DirectX;
 	coloredBatch->Begin();
+	renderAxes(coloredBatch);
 	for (int i = 0; i < coloredShapes.size(); i++) {
 		coloredShapes[i]->render();
 	}
+	//bulletWorld->debugDrawWorld();
 	coloredBatch->End();
 
 

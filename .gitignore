@@ -6,3 +6,6 @@ build
 directxtk_desktop_2015.2016.10.6.1
 /settings.manifest
 /*.opendb
+/~AutoRecover.Engine.vcxproj
+/~AutoRecover.Engine.vcxproj1
+/~AutoRecover.Engine.vcxproj2

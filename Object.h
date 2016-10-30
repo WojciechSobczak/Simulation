@@ -1,8 +1,6 @@
 #pragma once
 #include "pch.h"
 
-#define XM_VEC_FROM_BT_QUATERNION(q) 
-
 template<class T>
 class Object {
 public:
@@ -11,7 +9,7 @@ public:
 	const uint16_t* indices;
 	const T* vertices;
 	float size;
-	float mass = 50;
+	float mass = 1;
 	std::shared_ptr<DirectX::PrimitiveBatch<T>> batch;
 	std::vector<DirectX::XMVECTOR> points;
 	btRigidBody* rigidBody;
@@ -23,4 +21,15 @@ public:
 		world->addRigidBody(this->rigidBody);
 	}
 
+	virtual std::vector<DirectX::XMVECTOR> relocatePoints() {
+		using namespace DirectX;
+		btTransform transform = this->rigidBody->getCenterOfMassTransform();
+		std::vector<XMVECTOR> newpoints = std::vector<XMVECTOR>(points.size());
+		for (int i = 0; i < points.size(); i++) {
+			btVector3 vec = XMVECTOR_TO_BTVECTOR(points[i]);
+			vec = transform * vec;
+			newpoints[i] = vec.get128();
+		}
+		return newpoints;
+	}
 };

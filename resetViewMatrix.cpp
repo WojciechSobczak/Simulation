@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Simulation.h"
-#define MOVE_MULTIPLYER 2.0f
+#define MOVE_MULTIPLYER 4.0f
 
 void Simulation::resetViewMatrix() {
 	using namespace DirectX;
@@ -30,7 +30,7 @@ void Simulation::resetViewMatrix() {
 	}
 
 	if (moveUp) {
-		XMVECTOR_Y(position) += moveUp;
+		XMVECTOR_Y(position) += moveUp * MOVE_MULTIPLYER;
 	}
 
 	rotatedLook += position;
@@ -38,7 +38,6 @@ void Simulation::resetViewMatrix() {
 #ifdef CAMERA_DEBUG
 	Debug::printXMVECTOR(rotatedLook, "Look");
 #endif // CAMERA_DEBUG
-
 	moveForward = 0;
 	moveRight = 0;
 	moveUp = 0;

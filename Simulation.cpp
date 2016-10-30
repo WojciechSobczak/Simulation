@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "Simulation.h"
+#include "DXDebugDraw.h"
 
 using DirectX::SimpleMath::Matrix;
 using DirectX::SimpleMath::Vector3;
@@ -34,22 +35,31 @@ void Simulation::initialize(HWND window, int width, int height) {
 		physicsSolver,
 		physicsCollisionConfig
 	);
-	bulletWorld->setGravity(btVector3(0, -9.8, 0));
+	bulletWorld->setGravity(btVector3(0, -10, 0));
+	DXDebugDraw* debugDraw = new DXDebugDraw(coloredBatch);
+	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe); // so does this
+	debugDraw->setDebugMode(1); // this doesn't
+	bulletWorld->setDebugDrawer(debugDraw);
+
+	
 	timer.SetFixedTimeStep(true);
 	timer.SetTargetElapsedSeconds(tickTime);
 
-	DirectX::XMVECTOR start = {200.0f, 200.0f, 200.0f, 0.0f};
-	std::shared_ptr<Cube> cube = std::make_shared<Cube>(coloredBatch, start, 200);
-	start = {0.0f, 0.0f, 0.0f, 0.0f};
-	std::shared_ptr<Pyramid> pyramid = std::make_shared<Pyramid>(coloredBatch, start, 200);
-	std::shared_ptr<Floor> floor = std::make_shared<Floor>(coloredBatch, 500);
-	cube->registerCollisionObject(bulletWorld);
+	for (int i = 0; i < 30; i++) {
+		XMVECTOR start = {0,30 * i, 0,0};
+		std::shared_ptr<Cube> cube = std::make_shared<Cube>(coloredBatch, start, 50);
+		coloredShapes.push_back(cube);
+	}
 
+	std::shared_ptr<Floor> floor = std::make_shared<Floor>(coloredBatch, 2000);
 	coloredShapes.push_back(floor);
-	coloredShapes.push_back(cube);
-	coloredShapes.push_back(pyramid);
 
 
+	for (size_t i = 0; i < coloredShapes.size(); i++) {
+		coloredShapes[i]->registerCollisionObject(bulletWorld);
+	}
+
+	resetViewMatrix();
 }
 
 // Executes the basic game loop.
@@ -57,15 +67,14 @@ void Simulation::tick() {
 	timer.Tick([&]() {
 		update(timer);
 	});
-	bulletWorld->stepSimulation(tickTime);
 	renderScene();
 }
 
 // Updates the world.
 void Simulation::update(DX::StepTimer const& timer) {
-	float elapsedTime = float(timer.GetElapsedSeconds());
-	// TODO: Add your game logic here.
-	elapsedTime;
+	if (physicsEnabled) {
+		bulletWorld->stepSimulation(1.0f, 5, tickTime);
+	}
 }
 
 void Simulation::clearBuffers() {

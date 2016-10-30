@@ -16,4 +16,26 @@ namespace Debug {
 		std::string s = prefix + "Time: " + std::to_string(float(time) / CLOCKS_PER_SEC) + "\n";
 		OutputDebugStringA(s.c_str());
 	}
+
+	inline void printInt(int _int, std::string prefix = "") {
+		std::string s = prefix + std::to_string(_int) + "\n";
+		OutputDebugStringA(s.c_str());
+	}
+
+	inline void printFloat(float _float, std::string prefix = "") {
+		std::string s = prefix + std::to_string(_float) + "\n";
+		OutputDebugStringA(s.c_str());
+	}
+
+	inline void printbtVector(btVector3& vec, std::string prefix = "") {
+		std::string s = prefix + "btVec: x=" + std::to_string(vec.x()) + ", y=" + std::to_string(vec.y()) + ", z=" + std::to_string(vec.z()) + "\n";
+		OutputDebugStringA(s.c_str());
+	}
+
+	inline void printOrigin(btRigidBody* rigidBody, std::string prefix = "") {
+		using namespace DirectX;
+		btTransform transform;
+		rigidBody->getMotionState()->getWorldTransform(transform);
+		Debug::printbtVector(transform.getOrigin(), prefix);
+	}
 }

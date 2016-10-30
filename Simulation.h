@@ -57,11 +57,13 @@ private:
 
 	float moveForward = 0;
 	float moveRight = 0;
-	float moveUp = 250;
+	float moveUp = 0;
 
 	float yaw = 0;
 	float roll = 0;
 	float pitch = 1;
+
+	bool physicsEnabled = false;
 
 	const Matrix worldProjection = Matrix::CreatePerspectiveFieldOfView(M_PI_2, aspectRatio, 1, 2000);
 	//const Matrix worldProjection = Matrix::CreateOrthographicOffCenter(-500, 500, -500, 500, -500, 500);
@@ -71,7 +73,7 @@ private:
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	);
-	DirectX::XMVECTOR position = {-29.853180, 272.589142, -440.206512};
+	DirectX::XMVECTOR position = {-29.853180, 700.589142, -800.206512};
 	const DirectX::XMVECTOR cameraPosition = {0.0f, 0.0f, 0.0f};
 	const DirectX::XMVECTOR cameraUp = {0.0f, 1.0f, 0.0f};
 	const DirectX::XMVECTOR cameraLook = {0.0f, 0.0f, -1.0f};
@@ -112,6 +114,5 @@ private:
 	btCollisionDispatcher*									physicsCollisionDispatcher;
 	btBroadphaseInterface*									physicsBroadphase;
 	btSequentialImpulseConstraintSolver*					physicsSolver;
-	btDiscreteDynamicsWorld*								physicsWorld;
 	btAlignedObjectArray<btCollisionShape*>					physicsShapes;
 };

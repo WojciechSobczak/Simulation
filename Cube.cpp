@@ -2,75 +2,63 @@
 #include "Cube.h"
 using namespace DirectX;
 
+const uint16_t Cube::sideWalls[] = {
+	7, 3, 4, 0, 5, 1, 6, 2, 7, 3
+};
+const uint16_t Cube::upWall[] = {
+	3, 2, 0, 1
+};
+const uint16_t Cube::downWall[] = {
+	6, 7, 5, 4
+};
 
 Cube::Cube(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> batch, DirectX::XMVECTOR startPoint, float size) : Object(batch, startPoint, size) {
-	//XMVECTOR_X(startPoint), XMVECTOR_Y(startPoint), XMVECTOR_Z(startPoint)
-	btCollisionShape* colShape = new btBoxShape(btVector3(size, size, size));
+	btBoxShape* boxShape = new btBoxShape(btVector3(size/2, size/2, size/2));
 	btTransform playerWorld;
-	playerWorld.setIdentity();
-	playerWorld.setOrigin(btVector3(XMVECTOR_X(startPoint), XMVECTOR_Y(startPoint), XMVECTOR_Z(startPoint)));
-	btDefaultMotionState* motionState = new btDefaultMotionState(playerWorld);
+	btDefaultMotionState* motionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), XMVECTOR_TO_BTVECTOR(startPoint)));
 
 	btVector3 inertia(0, 0, 0);
-	colShape->calculateLocalInertia(mass, inertia);
+	boxShape->calculateLocalInertia(mass, inertia);
 	btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(
 		mass,                  // mass
 		motionState,        // initial position
-		colShape,              // collision shape of body
+		boxShape,              // collision shape of body
 		inertia    // local inertia
 	);
-	rigidBody = new btRigidBody(rigidBodyCI);
-	rigidBody->setCollisionShape(colShape);
-	rigidBody->setWorldTransform(playerWorld);
 
+	this->mass = 20;
+	rigidBody = new btRigidBody(rigidBodyCI);
+	rigidBody->setRestitution(0.5);
+	rigidBody->setActivationState(DISABLE_DEACTIVATION);
+	rigidBody->setFriction(0.6);
+	rigidBody->setUserIndex(-1);
+
+	XMVECTOR origin = {-size / 2, size/2, size/2, 0};
 	points = std::vector<XMVECTOR>(8);
 	for (int i = 0; i < 8; i += 4) {
-		points[i] = startPoint;
-		XMVECTOR_Z(startPoint) = XMVECTOR_Z(startPoint) + size;
-		points[i + 1] = startPoint;
-		XMVECTOR_X(startPoint) = XMVECTOR_X(startPoint) + size;
-		points[i + 2] = startPoint;
-		XMVECTOR_Z(startPoint) = XMVECTOR_Z(startPoint) - size;
-		points[i + 3] = startPoint;
-		XMVECTOR_X(startPoint) = XMVECTOR_X(startPoint) - size;
-		XMVECTOR_Y(startPoint) = XMVECTOR_Y(startPoint) + size;
+		points[i] = origin;
+		XMVECTOR_X(origin) = XMVECTOR_X(origin) + size;
+		points[i + 1] = origin;
+		XMVECTOR_Z(origin) = XMVECTOR_Z(origin) - size;
+		points[i + 2] = origin;
+		XMVECTOR_X(origin) = XMVECTOR_X(origin) - size;
+		points[i + 3] = origin;
+		XMVECTOR_Z(origin) = XMVECTOR_Z(origin) + size;
+		XMVECTOR_Y(origin) = XMVECTOR_Y(origin) - size;
 	}
 }
 
 void Cube::render() {
-	btTransform transform;
-	rigidBody->getMotionState()->getWorldTransform(transform);
-	XMVECTOR translation = transform.getOrigin().get128();
-	XMVECTOR rotationQuaterion = transform.getRotation().get128();
-	btScalar s = transform.getOrigin().getY();
-	
 
-	//for (int i = 0; i < points.size(); i++) {
-		/*XMVECTOR one = {1, 1, 1, 1};
-		XMMATRIX m = DirectX::XMMatrixAffineTransformation(one, startPoint, rotationQuaterion, translation);
-		XMVECTOR newpos = DirectX::XMVector3TransformCoord(startPoint, m);
-		OutputDebugStringA(("BUL: " + std::to_string(s) + "\n").c_str());
-		OutputDebugStringA(("COM: " + std::to_string(XMVECTOR_Y(newpos)) + "\n").c_str());*/
-
-	//}
-
+	std::vector<XMVECTOR> newpoints = relocatePoints();
 	DirectX::VertexPositionColor vertices[8];
 	for (int i = 0; i < 8; i += 4) {
-		vertices[i] = DirectX::VertexPositionColor(points[i], DirectX::Colors::Aqua);
-		vertices[i + 1] = DirectX::VertexPositionColor(points[i + 1], DirectX::Colors::Black);
-		vertices[i + 2] = DirectX::VertexPositionColor(points[i + 2], DirectX::Colors::Yellow);
-		vertices[i + 3] = DirectX::VertexPositionColor(points[i + 3], DirectX::Colors::Red);
+		vertices[i] = DirectX::VertexPositionColor(newpoints[i], DirectX::Colors::Aqua);
+		vertices[i + 1] = DirectX::VertexPositionColor(newpoints[i + 1], DirectX::Colors::Black);
+		vertices[i + 2] = DirectX::VertexPositionColor(newpoints[i + 2], DirectX::Colors::Yellow);
+		vertices[i + 3] = DirectX::VertexPositionColor(newpoints[i + 3], DirectX::Colors::Red);
 	}
 
-	const uint16_t sideWalls[] = {
-		3, 7, 0, 4, 1, 5, 2, 6, 3, 7
-	};
-	const uint16_t upWall[] = {
-		7,6,4,5
-	};
-	const uint16_t downWall[] = {
-		2, 3, 1, 0
-	};
 	batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, sideWalls, _countof(sideWalls), vertices, _countof(vertices));
 	batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, upWall, _countof(upWall), vertices, _countof(vertices));
 	batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, downWall, _countof(downWall), vertices, _countof(vertices));
