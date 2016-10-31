@@ -168,6 +168,7 @@
     <ClInclude Include="Floor.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Plank.h" />
     <ClInclude Include="Pyramid.h" />
     <ClInclude Include="RenderTables.h" />
     <ClInclude Include="Simulation.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="onKeyboardKeyPress.cpp" />
     <ClCompile Include="onMouseMove.cpp" />
+    <ClCompile Include="Plank.cpp" />
     <ClCompile Include="Pyramid.cpp" />
     <ClCompile Include="renderScene.cpp" />
     <ClCompile Include="RenderTables.cpp" />
@@ -202,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="directx.ico" />
+    <Image Include="plank.png" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="settings.manifest" />

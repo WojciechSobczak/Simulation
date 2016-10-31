@@ -31,7 +31,7 @@ void Simulation::renderScene() {
 	deviceContext->OMSetDepthStencilState(depthStencilStage.Get(), 0);
 	deviceContext->RSSetState(rasterizerStage.Get());
 	basicEffect->Apply(deviceContext.Get());
-	deviceContext->IASetInputLayout(inputLayout.Get());
+	deviceContext->IASetInputLayout(coloredInputLayout.Get());
 
 	
 	coloredBatch->Begin();

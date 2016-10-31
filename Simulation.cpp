@@ -5,6 +5,7 @@
 #include "pch.h"
 #include "Simulation.h"
 #include "DXDebugDraw.h"
+#include "Sphere.h"
 
 using DirectX::SimpleMath::Matrix;
 using DirectX::SimpleMath::Vector3;
@@ -38,7 +39,6 @@ void Simulation::initialize(HWND window, int width, int height) {
 	bulletWorld->setGravity(btVector3(0, -10, 0));
 	DXDebugDraw* debugDraw = new DXDebugDraw(coloredBatch);
 	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe); // so does this
-	debugDraw->setDebugMode(1); // this doesn't
 	bulletWorld->setDebugDrawer(debugDraw);
 
 	
@@ -46,7 +46,7 @@ void Simulation::initialize(HWND window, int width, int height) {
 	timer.SetTargetElapsedSeconds(tickTime);
 
 	for (int i = 0; i < 30; i++) {
-		XMVECTOR start = {0,30 * i, 0,0};
+		XMVECTOR start = {(20 * i % 50),80 * i, 0,0};
 		std::shared_ptr<Cube> cube = std::make_shared<Cube>(coloredBatch, start, 50);
 		coloredShapes.push_back(cube);
 	}
@@ -54,6 +54,9 @@ void Simulation::initialize(HWND window, int width, int height) {
 	std::shared_ptr<Floor> floor = std::make_shared<Floor>(coloredBatch, 2000);
 	coloredShapes.push_back(floor);
 
+	/*XMVECTOR start = {100, 200, 0, 0};
+	std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>(coloredBatch, start, 200, 20);
+	coloredShapes.push_back(sphere);*/
 
 	for (size_t i = 0; i < coloredShapes.size(); i++) {
 		coloredShapes[i]->registerCollisionObject(bulletWorld);
@@ -201,6 +204,7 @@ void Simulation::createDevice() {
 	basicEffect->SetVertexColorEnabled(true);
 	basicEffect->SetProjection(worldProjection);
 	basicEffect->SetView(cameraProjection);
+	basicEffect->SetVertexColorEnabled(true);
 
 	void const* shaderByteCode;
 	size_t byteCodeLength;
@@ -212,11 +216,14 @@ void Simulation::createDevice() {
 			VertexPositionColor::InputElements,
 			VertexPositionColor::InputElementCount,
 			shaderByteCode, byteCodeLength,
-			inputLayout.ReleaseAndGetAddressOf()
+			coloredInputLayout.ReleaseAndGetAddressOf()
 		)
 	);
+
 	coloredBatch = std::make_unique<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>(deviceContext.Get());
-	texturedTriangleBatch = std::make_unique<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>>(deviceContext.Get());
+	texturedBatch = std::make_unique<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>>(deviceContext.Get());
+
+	DX::ThrowIfFailed(CreateWICTextureFromFile(device.Get(), L"plank.png", nullptr, plankTexture.ReleaseAndGetAddressOf()));
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -380,7 +387,7 @@ void Simulation::onDeviceLost() {
 	states.reset();
 	basicEffect.reset();
 	coloredBatch.reset();
-	inputLayout.Reset();
+	coloredInputLayout.Reset();
 	rasterizerStage.Reset();
 
 	createDevice();

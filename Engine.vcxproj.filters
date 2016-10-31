@@ -69,6 +69,9 @@
     <ClInclude Include="Sphere.h">
       <Filter>Simulation\BasicShapes\Sphere</Filter>
     </ClInclude>
+    <ClInclude Include="Plank.h">
+      <Filter>Simulation\BasicShapes\Cube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -109,12 +112,18 @@
     <ClCompile Include="Sphere.cpp">
       <Filter>Simulation\BasicShapes\Sphere</Filter>
     </ClCompile>
+    <ClCompile Include="Plank.cpp">
+      <Filter>Simulation\BasicShapes\Cube</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="directx.ico">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="plank.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>

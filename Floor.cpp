@@ -31,8 +31,8 @@ void Floor::render() {
 
 		Vector3 scale = xaxis * fPercent + origin;
 
-		VertexPositionColor v1(scale - yaxis, DirectX::Colors::White);
-		VertexPositionColor v2(scale + yaxis, DirectX::Colors::White);
+		VertexPositionColor v1(scale - yaxis, DirectX::Colors::LightSlateGray);
+		VertexPositionColor v2(scale + yaxis, DirectX::Colors::LightSlateGray);
 		batch->DrawLine(v1, v2);
 	}
 
@@ -42,8 +42,8 @@ void Floor::render() {
 
 		Vector3 scale = yaxis * fPercent + origin;
 
-		VertexPositionColor v1(scale - xaxis, DirectX::Colors::White);
-		VertexPositionColor v2(scale + xaxis, DirectX::Colors::White);
+		VertexPositionColor v1(scale - xaxis, DirectX::Colors::LightSlateGray);
+		VertexPositionColor v2(scale + xaxis, DirectX::Colors::LightSlateGray);
 		batch->DrawLine(v1, v2);
 	}
 }

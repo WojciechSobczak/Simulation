@@ -105,8 +105,11 @@ private:
 	std::unique_ptr<DirectX::CommonStates>										states;
 	std::unique_ptr<DirectX::BasicEffect>										basicEffect;
 	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>		coloredBatch;
-	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>>	texturedTriangleBatch;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout>									inputLayout;
+	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>>	texturedBatch;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout>									coloredInputLayout;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout>									texturedInputLayout;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>							plankTexture;
 
 
 	btDiscreteDynamicsWorld*								bulletWorld;
