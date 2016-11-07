@@ -16,55 +16,6 @@ using Microsoft::WRL::ComPtr;
 Simulation::Simulation() : windowHandler(0), dxFeatureLevel(D3D_FEATURE_LEVEL_9_1) {}
 Simulation::~Simulation() {}
 
-
-// Initialize the Direct3D resources required to run.
-void Simulation::initialize(HWND window, int width, int height) {
-	windowHandler = window;
-	windowWidth = std::max(width, 1);
-	windowHeight = std::max(height, 1);
-	createDevice();
-	createResources();
-
-
-	physicsBroadphase = new btDbvtBroadphase();
-	physicsCollisionConfig = new btDefaultCollisionConfiguration();
-	physicsCollisionDispatcher = new btCollisionDispatcher(physicsCollisionConfig);
-	physicsSolver = new btSequentialImpulseConstraintSolver();
-	bulletWorld = new btDiscreteDynamicsWorld(
-		physicsCollisionDispatcher,
-		physicsBroadphase,
-		physicsSolver,
-		physicsCollisionConfig
-	);
-	bulletWorld->setGravity(btVector3(0, -10, 0));
-	DXDebugDraw* debugDraw = new DXDebugDraw(coloredBatch);
-	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe); // so does this
-	bulletWorld->setDebugDrawer(debugDraw);
-
-	
-	timer.SetFixedTimeStep(true);
-	timer.SetTargetElapsedSeconds(tickTime);
-
-	for (int i = 0; i < 30; i++) {
-		XMVECTOR start = {(20 * i % 50),80 * i, 0,0};
-		std::shared_ptr<Cube> cube = std::make_shared<Cube>(coloredBatch, start, 50);
-		coloredShapes.push_back(cube);
-	}
-
-	std::shared_ptr<Floor> floor = std::make_shared<Floor>(coloredBatch, 2000);
-	coloredShapes.push_back(floor);
-
-	/*XMVECTOR start = {100, 200, 0, 0};
-	std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>(coloredBatch, start, 200, 20);
-	coloredShapes.push_back(sphere);*/
-
-	for (size_t i = 0; i < coloredShapes.size(); i++) {
-		coloredShapes[i]->registerCollisionObject(bulletWorld);
-	}
-
-	resetViewMatrix();
-}
-
 // Executes the basic game loop.
 void Simulation::tick() {
 	timer.Tick([&]() {
@@ -76,7 +27,9 @@ void Simulation::tick() {
 // Updates the world.
 void Simulation::update(DX::StepTimer const& timer) {
 	if (physicsEnabled) {
-		bulletWorld->stepSimulation(1.0f, 5, tickTime);
+		static UINT64 lastTime = 20;
+		bulletWorld->stepSimulation(lastTime, 1, float(1) / 10);
+		lastTime = timer.GetElapsedTicks();
 	}
 }
 
@@ -86,7 +39,6 @@ void Simulation::clearBuffers() {
 	deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 	//Tworzenie viewportu
-	CD3D11_VIEWPORT viewport;
 	//TODO Dopracowaæ ¿eby siê skalowa³a szerokoœæ te¿
 	if (float(windowWidth) / float(windowHeight) != aspectRatio) {
 		viewport = CD3D11_VIEWPORT(0.0f, 0.0f, static_cast<float>(windowWidth), static_cast<float>(windowWidth / aspectRatio));
@@ -107,7 +59,7 @@ void Simulation::presentBackBuffer() {
 	if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
 		onDeviceLost();
 	} else {
-		DX::ThrowIfFailed(hr);
+		ThrowIfFailed(hr);
 	}
 }
 
@@ -134,7 +86,7 @@ void Simulation::createDevice() {
 
 	// Create the DX11 API device object, and get a corresponding context.
 	UINT creationFlags = 0;
-#ifdef _DEBUG
+#ifdef DEBUG
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 	HRESULT hr = D3D11CreateDevice(
@@ -166,14 +118,15 @@ void Simulation::createDevice() {
 		);
 	}
 
-	DX::ThrowIfFailed(hr);
+	ThrowIfFailed(hr);
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	ComPtr<ID3D11Debug> d3dDebug;
 	if (SUCCEEDED(device.As(&d3dDebug))) {
+		d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 		ComPtr<ID3D11InfoQueue> d3dInfoQueue;
 		if (SUCCEEDED(d3dDebug.As(&d3dInfoQueue))) {
-		#ifdef _DEBUG
+		#ifdef DEBUG
 			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
 			d3dInfoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, true);
 		#endif
@@ -197,21 +150,23 @@ void Simulation::createDevice() {
 	// TODO: Initialize device dependent objects here (independent of window size).
 
 	
+	ThrowIfFailed(CreateWICTextureFromFile(device.Get(), L"plank.png", nullptr, plankTexture.GetAddressOf()));
+	ThrowIfFailed(CreateWICTextureFromFile(device.Get(), L"box.png", nullptr, boxTexture.GetAddressOf()));
 	
 
 	states = std::make_unique<DirectX::CommonStates>(device.Get());
-	basicEffect = std::make_unique<DirectX::BasicEffect>(device.Get());
-	basicEffect->SetVertexColorEnabled(true);
-	basicEffect->SetProjection(worldProjection);
-	basicEffect->SetView(cameraProjection);
-	basicEffect->SetVertexColorEnabled(true);
+	coloredBasicEffect = std::make_unique<DirectX::BasicEffect>(device.Get());
+	coloredBasicEffect->SetProjection(projectionMatrix);
+	coloredBasicEffect->SetView(viewMatrix);
+	coloredBasicEffect->SetWorld(worldMatrix);
+	coloredBasicEffect->SetVertexColorEnabled(true);
 
 	void const* shaderByteCode;
 	size_t byteCodeLength;
 
-	basicEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
+	coloredBasicEffect->GetVertexShaderBytecode(&shaderByteCode, &byteCodeLength);
 
-	DX::ThrowIfFailed(
+	ThrowIfFailed(
 		device->CreateInputLayout(
 			VertexPositionColor::InputElements,
 			VertexPositionColor::InputElementCount,
@@ -219,11 +174,49 @@ void Simulation::createDevice() {
 			coloredInputLayout.ReleaseAndGetAddressOf()
 		)
 	);
-
 	coloredBatch = std::make_unique<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>(deviceContext.Get());
-	texturedBatch = std::make_unique<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>>(deviceContext.Get());
 
-	DX::ThrowIfFailed(CreateWICTextureFromFile(device.Get(), L"plank.png", nullptr, plankTexture.ReleaseAndGetAddressOf()));
+	#ifdef TEXTURES_ENABLED
+	void const* shaderByteCodetx;
+	size_t byteCodeLengthtx;
+	texturedBasicEffect = std::make_unique<DirectX::BasicEffect>(device.Get());
+	texturedBasicEffect->SetProjection(projectionMatrix);
+	texturedBasicEffect->SetView(viewMatrix);
+	texturedBasicEffect->SetWorld(worldMatrix);
+	texturedBasicEffect->SetTextureEnabled(true);
+	texturedBasicEffect->SetTexture(boxTexture.Get());
+	#ifdef LIGHTING_TEXTURES_ENABLED
+	//texturedBasicEffect->SetAmbientLightColor(Colors::White);
+	//texturedBasicEffect->SetDiffuseColor(Colors::White);
+	//texturedBasicEffect->SetEmissiveColor({163.f/255.f, 126.f/255.f, 74.f/255.f, 0});
+	//texturedBasicEffect->SetLightSpecularColor(0, Colors::White);
+	texturedBasicEffect->SetLightDirection(0, {0.f, 1.0f, 0.f, 0.f});//Dont ask why
+	texturedBasicEffect->SetLightEnabled(0, true);
+	texturedBasicEffect->SetLightingEnabled(true);
+	#endif // LIGHTING_TEXTURES_ENABLED
+	texturedBasicEffect->GetVertexShaderBytecode(&shaderByteCodetx, &byteCodeLengthtx);
+	ThrowIfFailed(
+		device->CreateInputLayout(
+			TEXTURED_VERTEX_TYPE::InputElements,
+			TEXTURED_VERTEX_TYPE::InputElementCount,
+			shaderByteCodetx, byteCodeLengthtx,
+			texturedInputLayout.ReleaseAndGetAddressOf()
+		)
+	);
+	texturedBatch = std::make_unique<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>>(deviceContext.Get());
+	#endif
+
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER::D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_MODE::D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MaxAnisotropy = (device->GetFeatureLevel() > D3D_FEATURE_LEVEL_9_1) ? D3D11_MAX_MAXANISOTROPY : 2;
+	samplerDesc.MaxLOD = FLT_MAX;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+
+	ThrowIfFailed(device->CreateSamplerState(&samplerDesc, samplerState.ReleaseAndGetAddressOf()));
+
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -240,9 +233,13 @@ void Simulation::createResources() {
 	DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 	DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	UINT backBufferCount = 2;
+	device->CheckMultisampleQualityLevels(backBufferFormat, sampleCount, &maxQualityLevel);
+	if (maxQualityLevel > 0) {
+		maxQualityLevel--;
+	}
 
 	// If the swap chain already exists, resize it, otherwise create one.
-	if (swapChain) {
+	if (/*swapChain*/ false) {
 		HRESULT hr = swapChain->ResizeBuffers(backBufferCount, backBufferWidth, backBufferHeight, backBufferFormat, 0);
 
 		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
@@ -253,32 +250,35 @@ void Simulation::createResources() {
 			// and correctly set up the new device.
 			return;
 		} else {
-			DX::ThrowIfFailed(hr);
+			ThrowIfFailed(hr);
 		}
 	} else {
+		swapChain.Reset();
 		// First, retrieve the underlying DXGI Device from the D3D Device.
 		ComPtr<IDXGIDevice1> dxgiDevice;
-		DX::ThrowIfFailed(device.As(&dxgiDevice));
+		ThrowIfFailed(device.As(&dxgiDevice));
 
 		// Identify the physical adapter (GPU or card) this device is running on.
 		ComPtr<IDXGIAdapter> dxgiAdapter;
-		DX::ThrowIfFailed(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
+		ThrowIfFailed(dxgiDevice->GetAdapter(dxgiAdapter.GetAddressOf()));
 
 		// And obtain the factory object that created it.
 		ComPtr<IDXGIFactory1> dxgiFactory;
-		DX::ThrowIfFailed(dxgiAdapter->GetParent(IID_PPV_ARGS(dxgiFactory.GetAddressOf())));
+		ThrowIfFailed(dxgiAdapter->GetParent(IID_PPV_ARGS(dxgiFactory.GetAddressOf())));
 
 		ComPtr<IDXGIFactory2> dxgiFactory2;
 		if (SUCCEEDED(dxgiFactory.As(&dxgiFactory2))) {
 			// DirectX 11.1 or later
+			//UINT qualityLevel = 0;
+			//device->CheckMultisampleQualityLevels(backBufferFormat, 4, &qualityLevel);
 
 			// Create a descriptor for the swap chain.
 			DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {0};
 			swapChainDesc.Width = backBufferWidth;
 			swapChainDesc.Height = backBufferHeight;
 			swapChainDesc.Format = backBufferFormat;
-			swapChainDesc.SampleDesc.Count = 1; //TODO pokombinowaæ tutaj z jakoœci¹
-			swapChainDesc.SampleDesc.Quality = 0;
+			swapChainDesc.SampleDesc.Count = sampleCount; //TODO pokombinowaæ tutaj z jakoœci¹
+			swapChainDesc.SampleDesc.Quality = maxQualityLevel;
 			swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			swapChainDesc.BufferCount = backBufferCount;
 
@@ -286,7 +286,7 @@ void Simulation::createResources() {
 			fsSwapChainDesc.Windowed = TRUE;
 
 			// Create a SwapChain from a Win32 window.
-			DX::ThrowIfFailed(dxgiFactory2->CreateSwapChainForHwnd(
+			ThrowIfFailed(dxgiFactory2->CreateSwapChainForHwnd(
 				device.Get(),
 				windowHandler,
 				&swapChainDesc,
@@ -295,7 +295,7 @@ void Simulation::createResources() {
 				swapChain1.ReleaseAndGetAddressOf()
 			));
 
-			DX::ThrowIfFailed(swapChain1.As(&swapChain));
+			ThrowIfFailed(swapChain1.As(&swapChain));
 		} else {
 			DXGI_SWAP_CHAIN_DESC swapChainDesc = {0};
 			swapChainDesc.BufferCount = backBufferCount;
@@ -304,33 +304,39 @@ void Simulation::createResources() {
 			swapChainDesc.BufferDesc.Format = backBufferFormat;
 			swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			swapChainDesc.OutputWindow = windowHandler;
-			swapChainDesc.SampleDesc.Count = 1;
-			swapChainDesc.SampleDesc.Quality = 0;
+			swapChainDesc.SampleDesc.Count = sampleCount;
+			swapChainDesc.SampleDesc.Quality = maxQualityLevel;
 			swapChainDesc.Windowed = TRUE;
 
-			DX::ThrowIfFailed(dxgiFactory->CreateSwapChain(device.Get(), &swapChainDesc, swapChain.ReleaseAndGetAddressOf()));
+			ThrowIfFailed(dxgiFactory->CreateSwapChain(device.Get(), &swapChainDesc, swapChain.ReleaseAndGetAddressOf()));
 		}
 
 		// This template does not support exclusive fullscreen mode and prevents DXGI from responding to the ALT+ENTER shortcut.
-		DX::ThrowIfFailed(dxgiFactory->MakeWindowAssociation(windowHandler, DXGI_MWA_NO_ALT_ENTER));
+		ThrowIfFailed(dxgiFactory->MakeWindowAssociation(windowHandler, DXGI_MWA_NO_ALT_ENTER));
 	}
 
 	// Obtain the backbuffer for this window which will be the final 3D rendertarget.
 	ComPtr<ID3D11Texture2D> backBuffer;
-	DX::ThrowIfFailed(swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf())));
+	ThrowIfFailed(swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf())));
 
 	// Create a view interface on the rendertarget to use on bind.
-	DX::ThrowIfFailed(device->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.ReleaseAndGetAddressOf()));
+	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	rtvDesc.Format = DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM;
+	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+	rtvDesc.Texture2D.MipSlice = 0;
+	ThrowIfFailed(device->CreateRenderTargetView(backBuffer.Get(), &rtvDesc, renderTargetView.ReleaseAndGetAddressOf()));
 
 	// Allocate a 2-D surface as the depth/stencil buffer and
 	// create a DepthStencil view on this surface to use on bind.
 	CD3D11_TEXTURE2D_DESC depthStencilDesc(depthBufferFormat, backBufferWidth, backBufferHeight, 1, 1, D3D11_BIND_DEPTH_STENCIL);
+	depthStencilDesc.SampleDesc.Count = sampleCount;
+	depthStencilDesc.SampleDesc.Quality = maxQualityLevel;
 
 	ComPtr<ID3D11Texture2D> depthStencil;
-	DX::ThrowIfFailed(device->CreateTexture2D(&depthStencilDesc, nullptr, depthStencil.GetAddressOf()));
+	ThrowIfFailed(device->CreateTexture2D(&depthStencilDesc, nullptr, depthStencil.GetAddressOf()));
 
-	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
-	DX::ThrowIfFailed(device->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, depthStencilView.ReleaseAndGetAddressOf()));
+	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2DMS);
+	ThrowIfFailed(device->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, depthStencilView.ReleaseAndGetAddressOf()));
 
 	CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, 
 									D3D11_CULL_BACK, 
@@ -340,9 +346,9 @@ void Simulation::createResources() {
 									D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, 
 									TRUE, 
 									FALSE, 
-									FALSE, 
+									TRUE, 
 									TRUE);
-	DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc, rasterizerStage.ReleaseAndGetAddressOf()));
+	ThrowIfFailed(device->CreateRasterizerState(&rastDesc, rasterizerStage.ReleaseAndGetAddressOf()));
 
 	D3D11_DEPTH_STENCIL_DESC dsDesc;
 	// Depth test parameters
@@ -385,17 +391,29 @@ void Simulation::onDeviceLost() {
 	device.Reset();
 
 	states.reset();
-	basicEffect.reset();
+	coloredBasicEffect.reset();
+	texturedBasicEffect.reset();
 	coloredBatch.reset();
 	coloredInputLayout.Reset();
 	rasterizerStage.Reset();
 
 	createDevice();
-
 	createResources();
 }
 
 void Simulation::onLeftMouseButtonDown(int x, int y) {
+	XMVECTOR boxPosition = observerPosition;
+	XMVECTOR rotationQuat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
+	XMVECTOR boxPositionDiplacement = XMVector3Rotate({0, 0, 1}, rotationQuat);
+	boxPosition += (XMVector3Normalize(boxPositionDiplacement) * 100);
+
+	btVector3 force = XMVECTOR_TO_BTVECTOR(boxPositionDiplacement);
+	force *= 1000;
+
+	std::shared_ptr<Cube> cube = std::make_shared<Cube>(texturedBatch, boxPosition, 20, 10);
+	cube->rigidBody->applyCentralImpulse(force);
+	cube->registerCollisionObject(bulletWorld);
+	texturedShapes.push_back(cube);
 	leftMouseButtonDown = true;
 }
 

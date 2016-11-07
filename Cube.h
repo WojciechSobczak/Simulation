@@ -1,13 +1,8 @@
 #pragma once
 #include "pch.h"
+#include "Box.h"
 
-class Cube : public Object<DirectX::VertexPositionColor> {
+class Cube : public Box {
 public:
-	Cube(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> batch, DirectX::XMVECTOR startPoint, float size);
-	virtual void render();
-	virtual void printToOutput();
-
-	static const uint16_t sideWalls[];
-	static const uint16_t upWall[];
-	static const uint16_t downWall[];
+	Cube(std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>> batch, DirectX::XMVECTOR startPoint, float size, float mass = 1) : Box(batch, startPoint, size, size, size, {0,0,0,0}, mass) {};
 };

@@ -30,23 +30,36 @@ void Simulation::renderScene() {
 	deviceContext->OMSetBlendState(states->Opaque(), nullptr, 0xFFFFFFFF);
 	deviceContext->OMSetDepthStencilState(depthStencilStage.Get(), 0);
 	deviceContext->RSSetState(rasterizerStage.Get());
-	basicEffect->Apply(deviceContext.Get());
-	deviceContext->IASetInputLayout(coloredInputLayout.Get());
+	deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
-	
+	deviceContext->IASetInputLayout(coloredInputLayout.Get());
+	coloredBasicEffect->Apply(deviceContext.Get());
 	coloredBatch->Begin();
 	renderAxes(coloredBatch);
 	for (int i = 0; i < coloredShapes.size(); i++) {
 		coloredShapes[i]->render();
 	}
-	//bulletWorld->debugDrawWorld();
+#ifdef SIMULATION_DRAW_DEBUG
+	bulletWorld->debugDrawWorld();
+#endif //SIMULATION_DRAW_DEBUG
 	coloredBatch->End();
 
 
-	//Zwalnianie bufora do renderowania
-	presentBackBuffer();
+#ifdef TEXTURES_ENABLED
+	deviceContext->IASetInputLayout(texturedInputLayout.Get());
+	texturedBasicEffect->Apply(deviceContext.Get());
+	texturedBatch->Begin();
+	for (int i = 0; i < texturedShapes.size(); i++) {
+		texturedShapes[i]->render();
+	}
+	texturedBatch->End();
+#endif // TEXTURES_ENABLED
 #ifdef TIME_EFF_TEST
 	Debug::printTime(clock() - before);
 #endif //TIME_EFF_TEST
+
+//Zwalnianie bufora do renderowania
+	presentBackBuffer();
+
 }
 

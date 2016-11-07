@@ -113,13 +113,6 @@ bool captureMouse(HWND hWnd) {
 	trackMouse.hwndTrack = hWnd;
 	trackMouse.dwHoverTime = 10;
 	trackMouse.cbSize = sizeof(tagTRACKMOUSEEVENT);
-#ifdef DEBUG
-	if (successTracking) {
-		OutputDebugStringA("Tracking success!\n");
-	} else {
-		OutputDebugStringA("Tracking failure!\n");
-	}
-#endif // DEBUG
 	return TrackMouseEvent(&trackMouse);
 }
 

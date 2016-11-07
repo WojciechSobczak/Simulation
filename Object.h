@@ -13,6 +13,10 @@ public:
 	std::shared_ptr<DirectX::PrimitiveBatch<T>> batch;
 	std::vector<DirectX::XMVECTOR> points;
 	btRigidBody* rigidBody;
+	//Cache
+	btTransform cachedTransform;
+	std::vector<DirectX::XMVECTOR> cachedPoints;
+	//End Cache
 	Object(std::shared_ptr<DirectX::PrimitiveBatch<T>> batch, DirectX::XMVECTOR startPoint, float size) : batch(batch), startPoint(startPoint), size(size) {}
 
 	virtual void render() = 0;
@@ -21,15 +25,17 @@ public:
 		world->addRigidBody(this->rigidBody);
 	}
 
-	virtual std::vector<DirectX::XMVECTOR> relocatePoints() {
+	virtual void relocatePoints() {
 		using namespace DirectX;
 		btTransform transform = this->rigidBody->getCenterOfMassTransform();
-		std::vector<XMVECTOR> newpoints = std::vector<XMVECTOR>(points.size());
+		if (transform == cachedTransform) {
+			return;
+		}
 		for (int i = 0; i < points.size(); i++) {
 			btVector3 vec = XMVECTOR_TO_BTVECTOR(points[i]);
 			vec = transform * vec;
-			newpoints[i] = vec.get128();
+			cachedPoints[i] = vec.get128();
 		}
-		return newpoints;
+		cachedTransform = transform;
 	}
 };

@@ -14,27 +14,30 @@ void Simulation::resetViewMatrix() {
 	////Teraz obracamy wokó³ osi X
 	XMMATRIX pitchMatrix = DirectX::XMMatrixRotationAxis(rotatedRight, pitch);
 	rotatedLook = DirectX::XMVector3TransformCoord(rotatedLook, pitchMatrix);
-	//XMVECTOR primalUp = DirectX::XMVector3TransformCoord(cameraUp, pitchMatrix);
 	//MAMY DZIA£AJ¥CE OBRACANIE, Teraz przesuniêcie
 
 	if (moveForward) {
 		XMVECTOR move = {0.0f, 0.0f, moveForward, 0.0f};
 		move = XMVector3TransformCoord(move, yawMatrix);
-		position += move * MOVE_MULTIPLYER;
+		observerPosition += move * MOVE_MULTIPLYER;
 	} 
 
 	if (moveRight) {
 		XMVECTOR move = {moveRight, 0.0f, 0.0f, 0.0f};
 		move = XMVector3TransformCoord(move, yawMatrix);
-		position += move * MOVE_MULTIPLYER;
+		observerPosition += move * MOVE_MULTIPLYER;
 	}
 
 	if (moveUp) {
-		XMVECTOR_Y(position) += moveUp * MOVE_MULTIPLYER;
+		XMVECTOR_Y(observerPosition) += moveUp * MOVE_MULTIPLYER;
 	}
 
-	rotatedLook += position;
-	basicEffect->SetView(DirectX::XMMatrixLookAtLH(position, rotatedLook, cameraUp));
+	rotatedLook += observerPosition;
+	viewMatrix = DirectX::XMMatrixLookAtLH(observerPosition, rotatedLook, cameraUp);
+	coloredBasicEffect->SetView(viewMatrix);
+	#ifdef TEXTURES_ENABLED
+	texturedBasicEffect->SetView(viewMatrix);
+	#endif
 #ifdef CAMERA_DEBUG
 	Debug::printXMVECTOR(rotatedLook, "Look");
 #endif // CAMERA_DEBUG

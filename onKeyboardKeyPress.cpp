@@ -1,40 +1,42 @@
 #include "pch.h"
 #include "Simulation.h"
+#ifdef DEBUG
 #define KEYBOARD_DEBUG
+#endif
 void Simulation::onKeyboardKeyPress() {
 	Vector3 buf = Vector3::Zero;
 	if ((1 << 16) & GetAsyncKeyState('W')) {
 		moveForward = 1;
 	#ifdef KEYBOARD_DEBUG
-		OutputDebugStringA("W pressed\n");
+		Debug::printString("W pressed");
 	#endif // KEYBOARD_DEBUG
 	} else if ((1 << 16) & GetAsyncKeyState('S')) {
 		moveForward = -1;
 	#ifdef KEYBOARD_DEBUG
-		OutputDebugStringA("S pressed\n");
+		Debug::printString("S pressed");
 	#endif // KEYBOARD_DEBUG
 	} 
 	if ((1 << 16) & GetAsyncKeyState('A')) {
 		moveRight = 1;
 	#ifdef KEYBOARD_DEBUG
-		OutputDebugStringA("A pressed\n");
+		Debug::printString("A pressed");
 	#endif // KEYBOARD_DEBUG
 	} else if ((1 << 16) & GetAsyncKeyState('D')) {
 		moveRight = -1;
 	#ifdef KEYBOARD_DEBUG
-		OutputDebugStringA("D pressed\n");
+		Debug::printString("D pressed");
 	#endif // KEYBOARD_DEBUG
 	} 
 	
 	if ((1 << 16) & GetAsyncKeyState('Q')) {
 		moveUp = 1;
 	#ifdef KEYBOARD_DEBUG
-		OutputDebugStringA("Q pressed\n");
+		Debug::printString("Q pressed");
 	#endif // KEYBOARD_DEBUG
 	} else if ((1 << 16) & GetAsyncKeyState('E')) {
 		moveUp = -1;
 	#ifdef KEYBOARD_DEBUG
-		OutputDebugStringA("E pressed\n");
+		Debug::printString("E pressed");
 	#endif // KEYBOARD_DEBUG
 	} 
 
@@ -42,7 +44,23 @@ void Simulation::onKeyboardKeyPress() {
 	if (0x8000 & GetKeyState('Z') && zpressed++ % 2) {
 		physicsEnabled = !physicsEnabled;
 	#ifdef KEYBOARD_DEBUG
-		OutputDebugStringA("Z pressed\n");
+		Debug::printString("Z pressed");
+	#endif // KEYBOARD_DEBUG
+	}
+
+	static int pPressed;
+	if (0x8000 & GetKeyState('P') && pPressed++ % 2) {
+		increaseMSAA();
+	#ifdef KEYBOARD_DEBUG
+		Debug::printString("P pressed");
+	#endif // KEYBOARD_DEBUG
+	}
+
+	static int oPressed;
+	if (0x8000 & GetKeyState('O') && oPressed++ % 2) {
+		decreaseMSAA();
+	#ifdef KEYBOARD_DEBUG
+		Debug::printString("O pressed");
 	#endif // KEYBOARD_DEBUG
 	}
 

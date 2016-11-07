@@ -18,6 +18,7 @@ Pyramid::Pyramid(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPosition
 	btConvexHullShape * shape = new btConvexHullShape();
 	//btTriangleMesh* mesh = new btTriangleMesh();
 	points = std::vector<XMVECTOR>(5);
+	cachedPoints = std::vector<XMVECTOR>(5);
 	VertexPositionColor vertices[5];
 	XMVECTOR startPointCopy ={0,0,0,0};
 	points[0] = startPointCopy;
@@ -56,13 +57,13 @@ Pyramid::Pyramid(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPosition
 
 void Pyramid::render() {
 
-	std::vector<XMVECTOR> newpoints = this->relocatePoints();
+	relocatePoints();
 	VertexPositionColor vertices[5];
-	vertices[0] = DirectX::VertexPositionColor(newpoints[0], DirectX::Colors::Aqua);
-	vertices[1] = DirectX::VertexPositionColor(newpoints[1], DirectX::Colors::Black);
-	vertices[2] = DirectX::VertexPositionColor(newpoints[2], DirectX::Colors::Yellow);
-	vertices[3] = DirectX::VertexPositionColor(newpoints[3], DirectX::Colors::Red);
-	vertices[4] = DirectX::VertexPositionColor(newpoints[4], DirectX::Colors::Green);
+	vertices[0] = DirectX::VertexPositionColor(cachedPoints[0], DirectX::Colors::Aqua);
+	vertices[1] = DirectX::VertexPositionColor(cachedPoints[1], DirectX::Colors::Black);
+	vertices[2] = DirectX::VertexPositionColor(cachedPoints[2], DirectX::Colors::Yellow);
+	vertices[3] = DirectX::VertexPositionColor(cachedPoints[3], DirectX::Colors::Red);
+	vertices[4] = DirectX::VertexPositionColor(cachedPoints[4], DirectX::Colors::Green);
 
 	batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
 							  indicies,

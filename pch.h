@@ -3,6 +3,20 @@
 // Header for standard system include files.
 //
 
+#define DEBUG
+
+#define TEXTURES_ENABLED
+//#define LIGHTING_TEXTURES_ENABLED
+#ifdef TEXTURES_ENABLED
+	#ifdef LIGHTING_TEXTURES_ENABLED
+		#define TEXTURED_VERTEX_TYPE DirectX::VertexPositionNormalTexture
+	#else // LIGHTING
+		#define TEXTURED_VERTEX_TYPE DirectX::VertexPositionTexture
+	#endif
+#else
+	#define TEXTURED_VERTEX_TYPE DirectX::VertexPositionColor
+#endif
+
 #pragma once
 
 #include <WinSDKVer.h>
@@ -48,6 +62,7 @@
 #include <memory>
 #include <stdexcept>
 #include <time.h>
+#include <string>
 
 #include "CommonStates.h"
 #include "DDSTextureLoader.h"
@@ -69,6 +84,56 @@
 
 #include <btBulletDynamicsCommon.h>
 
+#include "comdef.h"
+namespace DX {
+
+	inline std::wstring AnsiToWString(const std::string& str) {
+		WCHAR buffer[512];
+		MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, buffer, 512);
+		return std::wstring(buffer);
+	}
+
+	class DxException {
+	public:
+		DxException() = default;
+		DxException(HRESULT hr, const std::wstring& functionName, const std::wstring& filename, int lineNumber) : 
+			ErrorCode(hr),
+			FunctionName(functionName),
+			Filename(filename),
+			LineNumber(lineNumber) {}
+
+		HRESULT ErrorCode = S_OK;
+		std::wstring FunctionName;
+		std::wstring Filename;
+		int LineNumber = -1;
+		inline std::wstring toString() const {
+			// Get the string description of the error code.
+			_com_error err(ErrorCode);
+			std::wstring msg = err.ErrorMessage();
+
+			return FunctionName + L" failed in " + Filename + L"; line " + std::to_wstring(LineNumber) + L"; error: " + msg;
+		}
+	};
+
+	#ifndef ThrowIfFailed
+	#define ThrowIfFailed(x) { \
+		HRESULT hr__ = (x); \
+		std::wstring wfn = DX::AnsiToWString(__FILE__); \
+		if(FAILED(hr__)) { \
+			throw DX::DxException(hr__, L#x, wfn, __LINE__); \
+		} \
+	}
+	#endif
+
+
+
+	/*inline void ThrowIfFailed(HRESULT hr) {
+		if (FAILED(hr)) {
+			throw std::exception();
+		}
+	}*/
+}
+
 #include "Math.h"
 #include "Debug.h"
 #include "Object.h"
@@ -78,10 +143,9 @@
 #include "Simulation.h"
 #include "Window.h"
 
-namespace DX {
-	inline void ThrowIfFailed(HRESULT hr) {
-		if (FAILED(hr)) {
-			throw std::exception();
-		}
-	}
-}
+#ifndef DEBUG
+#define _HAS_ITERATOR_DEBUGGING 0
+#define _ITERATOR_DEBUG_LEVEL 0
+//_ITERATOR_DEBUG_LEVEL = 1 // enabled (if _SECURE_SCL is defined)
+//_ITERATOR_DEBUG_LEVEL = 2 // enabled (for debug builds)
+#endif

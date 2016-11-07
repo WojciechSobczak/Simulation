@@ -40,9 +40,9 @@ Plank::Plank(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionText
 
 void Plank::render() {
 
-	std::vector<XMVECTOR> newpoints = relocatePoints();
+	relocatePoints();
 	DirectX::VertexPositionTexture vertices[8];
-	vertices[0] = VertexPositionTexture(newpoints[0], {0, 50, 0, 0});
+	vertices[0] = VertexPositionTexture(cachedPoints[0], {0, 50, 0, 0});
 
 
 

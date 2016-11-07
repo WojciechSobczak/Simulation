@@ -42,6 +42,9 @@ public:
 private:
 
 	std::vector<std::shared_ptr<Object<DirectX::VertexPositionColor>>> coloredShapes;
+	#ifdef TEXTURES_ENABLED
+	std::vector<std::shared_ptr<Object<TEXTURED_VERTEX_TYPE>>> texturedShapes;
+	#endif
 
 
     void update(DX::StepTimer const& timer);
@@ -52,6 +55,36 @@ private:
     void createDevice();
     void createResources();
     void onDeviceLost();
+
+	int sampleIndex = 0;
+	UINT maxQualityLevel = 0;
+	UINT sampleCount = 1;
+	UINT sampleCountsAvailable[4] = {1, 2, 4, 8};
+
+	void increaseMSAA() {
+		sampleIndex++;
+		if (sampleIndex >= _countof(sampleCountsAvailable)) {
+			sampleIndex = _countof(sampleCountsAvailable) - 1;
+		}
+		sampleCount = sampleCountsAvailable[sampleIndex];
+		#if _DEBUG
+		Debug::printString("MSAA level = " + std::to_string(sampleCount));
+		#endif
+		createResources();
+	}
+
+	void decreaseMSAA() {
+		sampleIndex--;
+		if (sampleIndex < 0) {
+			sampleIndex = 0;
+		} 
+		sampleCount = sampleCountsAvailable[sampleIndex];
+		#if _DEBUG
+		Debug::printString("MSAA level = " + std::to_string(sampleCount));
+		#endif
+		createResources();
+	}
+
 	int prevMousex = 0;
 	int prevMousey = 0;
 
@@ -59,25 +92,28 @@ private:
 	float moveRight = 0;
 	float moveUp = 0;
 
-	float yaw = 0;
+	float yaw = M_PI;
 	float roll = 0;
 	float pitch = 1;
 
 	bool physicsEnabled = false;
 
-	const Matrix worldProjection = Matrix::CreatePerspectiveFieldOfView(M_PI_2, aspectRatio, 1, 2000);
-	//const Matrix worldProjection = Matrix::CreateOrthographicOffCenter(-500, 500, -500, 500, -500, 500);
-	DirectX::XMMATRIX cameraProjection = DirectX::XMMatrixSet(
+	DirectX::XMVECTOR observerPosition = { 0.0f, 300.589142, 300.206512 };
+	const DirectX::XMVECTOR cameraPosition = { 0.0f, 0.0f, 0.0f };
+	const DirectX::XMVECTOR cameraUp = { 0.0f, 1.0f, 0.0f };
+	const DirectX::XMVECTOR cameraLook = { 0.0f, 0.0f, -1.0f };
+	const DirectX::XMVECTOR cameraRight = { 1.0f, 0.0f, 0.0f };
+
+	const Matrix projectionMatrix = Matrix::CreatePerspectiveFieldOfView(M_PI_2, aspectRatio, 1, 2000);
+	const DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixSet(
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	);
-	DirectX::XMVECTOR position = {-29.853180, 700.589142, -800.206512};
-	const DirectX::XMVECTOR cameraPosition = {0.0f, 0.0f, 0.0f};
-	const DirectX::XMVECTOR cameraUp = {0.0f, 1.0f, 0.0f};
-	const DirectX::XMVECTOR cameraLook = {0.0f, 0.0f, -1.0f};
-	const DirectX::XMVECTOR cameraRight = {1.0f, 0.0f, 0.0f};
+
+	DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(observerPosition, DirectX::XMVector3TransformCoord(cameraLook, DirectX::XMMatrixRotationAxis(cameraUp, yaw)), cameraUp);
+	CD3D11_VIEWPORT viewport;
 
     // Device resources.
     HWND                                            windowHandler;
@@ -98,18 +134,24 @@ private:
 	//Stages
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState>	rasterizerStage;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStage;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
 
     // Rendering loop timer.
     DX::StepTimer timer;
 
-	std::unique_ptr<DirectX::CommonStates>										states;
-	std::unique_ptr<DirectX::BasicEffect>										basicEffect;
-	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>		coloredBatch;
-	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>>	texturedBatch;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout>									coloredInputLayout;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout>									texturedInputLayout;
+	std::unique_ptr<DirectX::CommonStates>											states;
+	std::unique_ptr<DirectX::BasicEffect>											coloredBasicEffect;
+	std::unique_ptr<DirectX::BasicEffect>											texturedBasicEffect;
+	std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>			coloredBatch;
+	#ifdef TEXTURES_ENABLED
+	std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>>	texturedBatch;
+	#endif
+
+	Microsoft::WRL::ComPtr<ID3D11InputLayout>										coloredInputLayout;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout>										texturedInputLayout;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>							plankTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>							boxTexture;
 
 
 	btDiscreteDynamicsWorld*								bulletWorld;

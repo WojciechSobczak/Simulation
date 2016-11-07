@@ -2,15 +2,13 @@
 #include "pch.h"
 #include "Object.h"
 using namespace DirectX;
-class Plank : public Object<VertexPositionTexture> {
+class Plank : public Box {
 public:
-	Plank(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionTexture>> batch, DirectX::XMVECTOR startPoint, float size);
-
-	virtual void render();
-	virtual void printToOutput();
-
-	static const uint16_t sideWalls[];
-	static const uint16_t upWall[];
-	static const uint16_t downWall[];
+	static const float width, height, depth;
+	Plank(std::shared_ptr<PrimitiveBatch<TEXTURED_VERTEX_TYPE>> batch, XMVECTOR startPoint, XMVECTOR yawPitchRoll = {0,0,0,0}, float mass = 20) : Box(batch, startPoint, Plank::width, Plank::height, Plank::depth, yawPitchRoll, mass) {};
 };
+
+const float Plank::width = 35;
+const float Plank::height = 70;
+const float Plank::depth = 6;
 

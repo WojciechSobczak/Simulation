@@ -69,15 +69,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -90,12 +94,14 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalIncludeDirectories>D:\Libraries\Bullet\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;dxguid.lib;uuid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;odbc32.lib;odbccp32.lib;Bullet2FileLoader_vs2010_debug.lib;Bullet3Collision_vs2010_debug.lib;Bullet3Common_vs2010_debug.lib;Bullet3Dynamics_vs2010_debug.lib;Bullet3Geometry_vs2010_debug.lib;Bullet3OpenCL_clew_vs2010_debug.lib;BulletCollision_vs2010_debug.lib;BulletDynamics_vs2010_debug.lib;BulletExampleBrowserLib_vs2010_debug.lib;BulletFileLoader_vs2010_debug.lib;BulletInverseDynamicsUtils_vs2010_debug.lib;BulletInverseDynamics_vs2010_debug.lib;BulletSoftBody_vs2010_debug.lib;BulletWorldImporter_vs2010_debug.lib;BussIK_vs2010_debug.lib;ConvexDecomposition_vs2010_debug.lib;HACD_vs2010_debug.lib;LinearMath_vs2010_debug.lib;OpenGL_Window_vs2010_debug.lib;gtest_vs2010_debug.lib;gwen_vs2010_debug.lib;vhacd_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\Libraries\Bullet\bullet3\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>D:\Programowanie\Jenżynierka\NowyEngine\Engine\x64\Debug\Engine_manifest.rc</ManifestFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -108,12 +114,14 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>D:\Libraries\Bullet\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;dxguid.lib;uuid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;odbc32.lib;odbccp32.lib;Bullet2FileLoader_vs2010_debug.lib;Bullet3Collision_vs2010_debug.lib;Bullet3Common_vs2010_debug.lib;Bullet3Dynamics_vs2010_debug.lib;Bullet3Geometry_vs2010_debug.lib;Bullet3OpenCL_clew_vs2010_debug.lib;BulletCollision_vs2010_debug.lib;BulletDynamics_vs2010_debug.lib;BulletExampleBrowserLib_vs2010_debug.lib;BulletFileLoader_vs2010_debug.lib;BulletInverseDynamicsUtils_vs2010_debug.lib;BulletInverseDynamics_vs2010_debug.lib;BulletSoftBody_vs2010_debug.lib;BulletWorldImporter_vs2010_debug.lib;BussIK_vs2010_debug.lib;ConvexDecomposition_vs2010_debug.lib;HACD_vs2010_debug.lib;LinearMath_vs2010_debug.lib;OpenGL_Window_vs2010_debug.lib;gtest_vs2010_debug.lib;gwen_vs2010_debug.lib;vhacd_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\Libraries\Bullet\bullet3\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>D:\Programowanie\Jenżynierka\NowyEngine\Engine\x64\Debug\Engine_manifest.rc</ManifestFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,6 +137,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalIncludeDirectories>D:\Libraries\Bullet\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,6 +146,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>d3d11.lib;dxguid.lib;uuid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;odbc32.lib;odbccp32.lib;Bullet2FileLoader_vs2010_debug.lib;Bullet3Collision_vs2010_debug.lib;Bullet3Common_vs2010_debug.lib;Bullet3Dynamics_vs2010_debug.lib;Bullet3Geometry_vs2010_debug.lib;Bullet3OpenCL_clew_vs2010_debug.lib;BulletCollision_vs2010_debug.lib;BulletDynamics_vs2010_debug.lib;BulletExampleBrowserLib_vs2010_debug.lib;BulletFileLoader_vs2010_debug.lib;BulletInverseDynamicsUtils_vs2010_debug.lib;BulletInverseDynamics_vs2010_debug.lib;BulletSoftBody_vs2010_debug.lib;BulletWorldImporter_vs2010_debug.lib;BussIK_vs2010_debug.lib;ConvexDecomposition_vs2010_debug.lib;HACD_vs2010_debug.lib;LinearMath_vs2010_debug.lib;OpenGL_Window_vs2010_debug.lib;gtest_vs2010_debug.lib;gwen_vs2010_debug.lib;vhacd_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\Libraries\Bullet\bullet3\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>D:\Programowanie\Jenżynierka\NowyEngine\Engine\x64\Debug\Engine_manifest.rc</ManifestFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,6 +161,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>D:\Libraries\Bullet\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,9 +170,11 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>d3d11.lib;dxguid.lib;uuid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;odbc32.lib;odbccp32.lib;Bullet2FileLoader_vs2010_debug.lib;Bullet3Collision_vs2010_debug.lib;Bullet3Common_vs2010_debug.lib;Bullet3Dynamics_vs2010_debug.lib;Bullet3Geometry_vs2010_debug.lib;Bullet3OpenCL_clew_vs2010_debug.lib;BulletCollision_vs2010_debug.lib;BulletDynamics_vs2010_debug.lib;BulletExampleBrowserLib_vs2010_debug.lib;BulletFileLoader_vs2010_debug.lib;BulletInverseDynamicsUtils_vs2010_debug.lib;BulletInverseDynamics_vs2010_debug.lib;BulletSoftBody_vs2010_debug.lib;BulletWorldImporter_vs2010_debug.lib;BussIK_vs2010_debug.lib;ConvexDecomposition_vs2010_debug.lib;HACD_vs2010_debug.lib;LinearMath_vs2010_debug.lib;OpenGL_Window_vs2010_debug.lib;gtest_vs2010_debug.lib;gwen_vs2010_debug.lib;vhacd_vs2010_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\Libraries\Bullet\bullet3\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile>D:\Programowanie\Jenżynierka\NowyEngine\Engine\x64\Debug\Engine_manifest.rc</ManifestFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Box.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DXDebugDraw.h" />
@@ -171,6 +184,7 @@
     <ClInclude Include="Plank.h" />
     <ClInclude Include="Pyramid.h" />
     <ClInclude Include="RenderTables.h" />
+    <ClInclude Include="scenarios.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Sphere.h" />
@@ -178,12 +192,13 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Box.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Floor.cpp" />
+    <ClCompile Include="initialize.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="onKeyboardKeyPress.cpp" />
     <ClCompile Include="onMouseMove.cpp" />
-    <ClCompile Include="Plank.cpp" />
     <ClCompile Include="Pyramid.cpp" />
     <ClCompile Include="renderScene.cpp" />
     <ClCompile Include="RenderTables.cpp" />
@@ -203,6 +218,7 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="box.png" />
     <Image Include="directx.ico" />
     <Image Include="plank.png" />
   </ItemGroup>

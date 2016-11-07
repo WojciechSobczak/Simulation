@@ -45,29 +45,31 @@ Sphere::Sphere(std::shared_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionCo
 			points.push_back(transformedPoint);
 		}
 	}
+
+	cachedPoints = std::vector<XMVECTOR>(points.size());
 }
 
 void Sphere::render() {
-	std::vector<XMVECTOR> newPoints = relocatePoints();
-	std::vector<VertexPositionColor> vertices = std::vector<VertexPositionColor>(newPoints.size());
-	std::vector<uint16_t> indicies = std::vector<UINT16>(2 * newPoints.size());
-	for (size_t i = 0; i < newPoints.size(); i++) {
-		vertices[i] = VertexPositionColor(newPoints[i], Colors::GreenYellow);
+	relocatePoints();
+	std::vector<VertexPositionColor> vertices = std::vector<VertexPositionColor>(cachedPoints.size());
+	std::vector<uint16_t> indicies = std::vector<UINT16>(2 * cachedPoints.size());
+	for (size_t i = 0; i < cachedPoints.size(); i++) {
+		vertices[i] = VertexPositionColor(cachedPoints[i], Colors::GreenYellow);
 	}
 
 	int index = 0;
 	for (size_t circleIndex = 0; circleIndex < divider; circleIndex++) {
 		for (size_t i = 0; i < divider - 1; i++) {
-			indicies[index++] = (((circleIndex + 1) * divider) + i) % newPoints.size();
-			indicies[index++] = ((circleIndex * divider) + i) % newPoints.size();
+			indicies[index++] = (((circleIndex + 1) * divider) + i) % cachedPoints.size();
+			indicies[index++] = ((circleIndex * divider) + i) % cachedPoints.size();
 		}
 	}
 #define SPHERE_DEBUG
 #ifdef SPHERE_DEBUG
 	for (size_t i = 0; i < indicies.size() - 1; i++) {
 		batch->DrawLine(
-			VertexPositionColor(newPoints[indicies[i]], Colors::Black),
-			VertexPositionColor(newPoints[indicies[i + 1]], Colors::Black)
+			VertexPositionColor(cachedPoints[indicies[i]], Colors::Black),
+			VertexPositionColor(cachedPoints[indicies[i + 1]], Colors::Black)
 		);
 	}
 #endif // SPHERE_DEBUG
