@@ -35,7 +35,8 @@ void Simulation::initialize(HWND window, int width, int height) {
 	std::shared_ptr<Floor> floor = std::make_shared<Floor>(coloredBatch, 2000);
 	coloredShapes.push_back(floor);
 	floor->registerCollisionObject(bulletWorld);
-	Scenario::plankTowers(texturedShapes, bulletWorld, texturedBatch);
-	Scenario::plankDomino(texturedShapes, bulletWorld, texturedBatch);
+	//Scenario::boxTowers(texturedShapes, bulletWorld, texturedBatch);
+	//Scenario::plankDomino(texturedShapes, bulletWorld, texturedBatch);
+	Scenario::houseOfCards(texturedShapes, bulletWorld, texturedBatch);
 	resetViewMatrix();
 }

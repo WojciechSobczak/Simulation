@@ -3,7 +3,7 @@
 #include "Plank.h"
 
 namespace Scenario {
-	void plankTowers(std::vector<std::shared_ptr<Object<TEXTURED_VERTEX_TYPE>>> &shapes, btDiscreteDynamicsWorld* world, std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>> batch) {
+	void boxTowers(std::vector<std::shared_ptr<Object<TEXTURED_VERTEX_TYPE>>> &shapes, btDiscreteDynamicsWorld* world, std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>> batch) {
 		
 		XMVECTOR start = {-Plank::height / 2, Plank::height / 2, Plank::height / 2 ,0};
 		XMVECTOR cacheStart = start;
@@ -63,7 +63,41 @@ namespace Scenario {
 	}
 
 	void houseOfCards(std::vector<std::shared_ptr<Object<TEXTURED_VERTEX_TYPE>>> &shapes, btDiscreteDynamicsWorld* world, std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>> batch) {
+		float spaceBetween = Plank::height;
+		int elementsAmount = 16;
+		int startSize = shapes.size();
+		XMVECTOR yawPitchRoll = {M_PI_2, 0, 0, 0};
+		XMVECTOR start = { -((float(elementsAmount)/2) * spaceBetween), Plank::height/2,0,0 };
+		XMVECTOR cachedStart = start;
 
+		for (int level = 0; level < 5; level++) {
+			float heightStep = level * (Plank::height + Plank::depth);
+			float elements = elementsAmount - level * 2;
+			for (int i = 0; i < elements; i++) {
+				yawPitchRoll = {M_PI_2, 0, 0, 0};
+				std::shared_ptr<Plank> plank = std::make_shared<Plank>(batch, start, yawPitchRoll);
+				shapes.push_back(plank);
+
+				if (i != elements - 1) {
+					float displacement = Plank::height / 2;
+					XMVECTOR_X(start) += displacement;
+					XMVECTOR_Y(start) += displacement + Plank::depth/2;
+					yawPitchRoll = {0, M_PI_2, M_PI_2, 0};
+					std::shared_ptr<Plank> roof = std::make_shared<Plank>(batch, start, yawPitchRoll);
+					shapes.push_back(roof);
+					XMVECTOR_X(start) -= displacement;
+					XMVECTOR_Y(start) -= displacement + Plank::depth/2;;
+				}
+				XMVECTOR_X(start) += spaceBetween;
+			}
+			XMVECTOR_X(start) = -((float(elementsAmount - (level + 1)*2) / 2) * spaceBetween);
+			XMVECTOR_Y(start) += Plank::height + Plank::depth;
+		}
+		
+
+		for (int i = startSize; i < shapes.size(); i++) {
+			shapes[i]->registerCollisionObject(world);
+		}
 	}
 
 }
