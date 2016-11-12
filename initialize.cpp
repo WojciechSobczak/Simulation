@@ -27,7 +27,7 @@ void Simulation::initialize(HWND window, int width, int height) {
 	);
 	bulletWorld->setGravity(btVector3(0, -10, 0));
 	DXDebugDraw* debugDraw = new DXDebugDraw(coloredBatch);
-	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe); // so does this
+	debugDraw->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
 	bulletWorld->setDebugDrawer(debugDraw);
 	timer.SetFixedTimeStep(true);
 	timer.SetTargetElapsedSeconds(tickTime);
@@ -36,7 +36,7 @@ void Simulation::initialize(HWND window, int width, int height) {
 	coloredShapes.push_back(floor);
 	floor->registerCollisionObject(bulletWorld);
 	//Scenario::boxTowers(texturedShapes, bulletWorld, texturedBatch);
-	//Scenario::plankDomino(texturedShapes, bulletWorld, texturedBatch);
-	Scenario::houseOfCards(texturedShapes, bulletWorld, texturedBatch);
+	Scenario::plankDomino(texturedShapes, bulletWorld, texturedBatch);
+	//Scenario::houseOfCards(texturedShapes, bulletWorld, texturedBatch);
 	resetViewMatrix();
 }
