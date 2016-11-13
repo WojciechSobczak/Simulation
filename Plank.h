@@ -8,7 +8,3 @@ public:
 	Plank(std::shared_ptr<PrimitiveBatch<TEXTURED_VERTEX_TYPE>> batch, XMVECTOR startPoint, XMVECTOR yawPitchRoll = {0,0,0,0}, float mass = 20) : Box(batch, startPoint, Plank::width, Plank::height, Plank::depth, yawPitchRoll, mass) {};
 };
 
-const float Plank::width = 35;
-const float Plank::height = 70;
-const float Plank::depth = 6;
-

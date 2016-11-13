@@ -1,5 +1,10 @@
 #include "pch.h"
 #include "Window.h"
+#include "scenarios.h"
+
+#define SIMMENU_DOMINO 1
+#define SIMMENU_TOWERS 2
+#define SIMMENU_HOUSEOFCARDS 3
 
 
 LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
@@ -15,6 +20,23 @@ LRESULT CALLBACK windowMessagesHandler(HWND hWnd, UINT message, WPARAM wParam, L
 	Simulation* simulation = reinterpret_cast<Simulation*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 	switch (message) {
+		case WM_COMMAND: {
+			switch (LOWORD(wParam)) {
+				case SIMMENU_DOMINO: {
+					simulation->initScenario(Scenario::plankDomino);
+					break;
+				}
+				case SIMMENU_TOWERS: {
+					simulation->initScenario(Scenario::boxTowers);
+					break;
+				}
+				case SIMMENU_HOUSEOFCARDS: {
+					simulation->initScenario(Scenario::houseOfCards);
+					break;
+				}
+			}
+			break;
+		}
 		case WM_PAINT:
 			hdc = BeginPaint(hWnd, &ps);
 			EndPaint(hWnd, &ps);
@@ -160,6 +182,16 @@ HWND createWindow(HINSTANCE hInstance, std::shared_ptr<Simulation> simulation, i
 	if (!windowHandler) {
 		exit(1);
 	}
+
+	HMENU hMenubar = CreateMenu();
+    HMENU hMenu = CreateMenu();
+    AppendMenuW(hMenu, MF_STRING, SIMMENU_DOMINO, L"&Domino");
+    AppendMenuW(hMenu, MF_STRING, SIMMENU_HOUSEOFCARDS, L"&House of cards");
+	AppendMenuW(hMenu, MF_STRING, SIMMENU_TOWERS, L"&Tower");
+    AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
+
+    AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR) hMenu, L"&Scenarios");
+    SetMenu(windowHandler, hMenubar);
 
 	ShowWindow(windowHandler, nCmdShow);
 	SetWindowLongPtr(windowHandler, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(simulation.get()));

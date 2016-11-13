@@ -25,6 +25,10 @@ public:
 		world->addRigidBody(this->rigidBody);
 	}
 
+	virtual void unregisterCollisionObject(btDiscreteDynamicsWorld* world) {
+		world->removeRigidBody(this->rigidBody);
+	}
+
 	virtual void relocatePoints() {
 		using namespace DirectX;
 		btTransform transform = this->rigidBody->getCenterOfMassTransform();

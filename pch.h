@@ -3,6 +3,8 @@
 // Header for standard system include files.
 //
 
+#pragma once
+
 #define DEBUG
 
 #define TEXTURES_ENABLED
@@ -16,8 +18,6 @@
 #else
 	#define TEXTURED_VERTEX_TYPE DirectX::VertexPositionColor
 #endif
-
-#pragma once
 
 #include <WinSDKVer.h>
 #define _WIN32_WINNT 0x0600

@@ -39,6 +39,7 @@ public:
 	bool leftMouseButtonDown = false;
 	bool rightMouseButtonUp = false;
 
+	void initScenario(void (*func)(std::vector<std::shared_ptr<Object<TEXTURED_VERTEX_TYPE>>>&, btDiscreteDynamicsWorld*, std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>>));
 private:
 
 	std::vector<std::shared_ptr<Object<DirectX::VertexPositionColor>>> coloredShapes;
@@ -55,6 +56,8 @@ private:
     void createDevice();
     void createResources();
     void onDeviceLost();
+
+	void removeAllWorldObjects();
 
 	int sampleIndex = 0;
 	UINT maxQualityLevel = 0;

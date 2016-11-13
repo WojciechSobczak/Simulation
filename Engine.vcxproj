@@ -199,10 +199,12 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="onKeyboardKeyPress.cpp" />
     <ClCompile Include="onMouseMove.cpp" />
+    <ClCompile Include="Plank.cpp" />
     <ClCompile Include="Pyramid.cpp" />
     <ClCompile Include="renderScene.cpp" />
     <ClCompile Include="RenderTables.cpp" />
     <ClCompile Include="resetViewMatrix.cpp" />
+    <ClCompile Include="Scenarios.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">

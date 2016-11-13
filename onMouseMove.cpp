@@ -1,5 +1,5 @@
 #include "pch.h"
-#define mouse_step 0.01f;
+#define mouse_step 0.02f;
 #define control_angle(x) if (x > 2*M_PI) {x = 0;} else if (x < 0) {x = 2*M_PI;}
 #define pitch_control_angle(x) if (x > M_PI_2) {x = M_PI_2 - 0.01f;} else if (x < -M_PI_2) {x = -M_PI_2 + 0.01f;}
 

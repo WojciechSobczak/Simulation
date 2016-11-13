@@ -401,6 +401,18 @@ void Simulation::onDeviceLost() {
 	createResources();
 }
 
+void Simulation::removeAllWorldObjects() {
+	for (int i = 0; i < texturedShapes.size(); i++) {
+		texturedShapes[i]->unregisterCollisionObject(bulletWorld);
+	}
+	texturedShapes.clear();
+}
+
+void Simulation::initScenario(void(*func)(std::vector<std::shared_ptr<Object<TEXTURED_VERTEX_TYPE>>>&, btDiscreteDynamicsWorld*, std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>>)) {
+	removeAllWorldObjects();
+	func(this->texturedShapes, this->bulletWorld, this->texturedBatch);
+}
+
 void Simulation::onLeftMouseButtonDown(int x, int y) {
 	XMVECTOR boxPosition = observerPosition;
 	XMVECTOR rotationQuat = XMQuaternionRotationRollPitchYaw(pitch, yaw, roll);
