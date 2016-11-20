@@ -18,6 +18,7 @@ public:
 	std::vector<DirectX::XMVECTOR> cachedPoints;
 	//End Cache
 	Object(std::shared_ptr<DirectX::PrimitiveBatch<T>> batch, DirectX::XMVECTOR startPoint, float size) : batch(batch), startPoint(startPoint), size(size) {}
+	DirectX::XMVECTOR color = {255.f/255.f, 255.f/255.f, 255.f/255.f, 1.0f};
 
 	virtual void render() = 0;
 	virtual void printToOutput() = 0;

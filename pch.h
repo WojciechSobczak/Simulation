@@ -6,13 +6,12 @@
 #pragma once
 
 #define DEBUG
-
+#define TEXTURE_COLOR_ENABLED
 #define TEXTURES_ENABLED
-//#define LIGHTING_TEXTURES_ENABLED
 #ifdef TEXTURES_ENABLED
-	#ifdef LIGHTING_TEXTURES_ENABLED
-		#define TEXTURED_VERTEX_TYPE DirectX::VertexPositionNormalTexture
-	#else // LIGHTING
+	#ifdef TEXTURE_COLOR_ENABLED
+		#define TEXTURED_VERTEX_TYPE DirectX::VertexPositionColorTexture
+	#else // TEXTURE_COLOR_ENABLED
 		#define TEXTURED_VERTEX_TYPE DirectX::VertexPositionTexture
 	#endif
 #else

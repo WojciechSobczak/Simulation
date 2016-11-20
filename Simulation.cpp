@@ -184,16 +184,8 @@ void Simulation::createDevice() {
 	texturedBasicEffect->SetView(viewMatrix);
 	texturedBasicEffect->SetWorld(worldMatrix);
 	texturedBasicEffect->SetTextureEnabled(true);
+	texturedBasicEffect->SetVertexColorEnabled(true);
 	texturedBasicEffect->SetTexture(boxTexture.Get());
-	#ifdef LIGHTING_TEXTURES_ENABLED
-	//texturedBasicEffect->SetAmbientLightColor(Colors::White);
-	//texturedBasicEffect->SetDiffuseColor(Colors::White);
-	//texturedBasicEffect->SetEmissiveColor({163.f/255.f, 126.f/255.f, 74.f/255.f, 0});
-	//texturedBasicEffect->SetLightSpecularColor(0, Colors::White);
-	texturedBasicEffect->SetLightDirection(0, {0.f, 1.0f, 0.f, 0.f});//Dont ask why
-	texturedBasicEffect->SetLightEnabled(0, true);
-	texturedBasicEffect->SetLightingEnabled(true);
-	#endif // LIGHTING_TEXTURES_ENABLED
 	texturedBasicEffect->GetVertexShaderBytecode(&shaderByteCodetx, &byteCodeLengthtx);
 	ThrowIfFailed(
 		device->CreateInputLayout(
@@ -241,11 +233,9 @@ void Simulation::createResources() {
 	// If the swap chain already exists, resize it, otherwise create one.
 	if (/*swapChain*/ false) {
 		HRESULT hr = swapChain->ResizeBuffers(backBufferCount, backBufferWidth, backBufferHeight, backBufferFormat, 0);
-
 		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET) {
 			// If the device was removed for any reason, a new device and swap chain will need to be created.
 			onDeviceLost();
-
 			// Everything is set up now. Do not continue execution of this method. OnDeviceLost will reenter this method 
 			// and correctly set up the new device.
 			return;
@@ -425,6 +415,7 @@ void Simulation::onLeftMouseButtonDown(int x, int y) {
 	std::shared_ptr<Cube> cube = std::make_shared<Cube>(texturedBatch, boxPosition, 20, 10);
 	cube->rigidBody->applyCentralImpulse(force);
 	cube->registerCollisionObject(bulletWorld);
+	cube->color = {1,0,0,0};
 	texturedShapes.push_back(cube);
 	leftMouseButtonDown = true;
 }

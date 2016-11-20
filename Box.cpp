@@ -57,8 +57,8 @@ void Box::render() {
 	relocatePoints();
 	
 	#ifdef TEXTURES_ENABLED
-	#ifdef LIGHTING_TEXTURES_ENABLED
-		#define TEXTURE(x, tx, ty) cachedPoints[x], { tx, ty }
+	#ifdef TEXTURE_COLOR_ENABLED
+		#define TEXTURE(x, tx, ty) color, { tx, ty }
 	#else
 		#define TEXTURE(x, tx, ty) { tx, ty }
 	#endif
