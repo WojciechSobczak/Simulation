@@ -139,6 +139,7 @@ namespace DX {
 #include "Cube.h"
 #include "Floor.h"
 #include "Pyramid.h"
+#include "scenarios.h"
 #include "Simulation.h"
 #include "Window.h"
 

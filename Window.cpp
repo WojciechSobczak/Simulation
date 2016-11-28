@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Window.h"
-#include "scenarios.h"
 
 #define SIMMENU_DOMINO 1
 #define SIMMENU_TOWERS 2

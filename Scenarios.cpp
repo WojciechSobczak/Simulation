@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "scenarios.h"
 #include "Plank.h"
 
 void Scenario::boxTowers(std::vector<std::shared_ptr<Object<TEXTURED_VERTEX_TYPE>>> &shapes, btDiscreteDynamicsWorld* world, std::shared_ptr<DirectX::PrimitiveBatch<TEXTURED_VERTEX_TYPE>> batch) {

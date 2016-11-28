@@ -2,7 +2,6 @@
 #include "Simulation.h"
 #include "DXDebugDraw.h"
 #include "Plank.h"
-#include "scenarios.h"
 
 using namespace DirectX;
 

@@ -17,6 +17,7 @@ Simulation::Simulation() : windowHandler(0), dxFeatureLevel(D3D_FEATURE_LEVEL_9_
 Simulation::~Simulation() {}
 
 // Executes the basic game loop.
+
 void Simulation::tick() {
 	timer.Tick([&]() {
 		update(timer);
